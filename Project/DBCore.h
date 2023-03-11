@@ -63,4 +63,37 @@ public:
 
         _array = std::move(newArray);
     }
+
+    /*
+overloaded index taking operator.
+Returns a pointer to the array value by index,
+nullptr if array is empry or index out if range..
+*/
+    T &operator[](const int index)
+    {
+
+        if (index >= 0 && index < _size)
+        {
+            return _array[index];
+        }
+        if (isEmpty())
+        {
+            throw;
+        }
+        throw std::overflow_error("Index out of range!!!");
+    }
+
+    T &operator[](const int index) const
+    {
+
+        if (index >= 0 && index < _size)
+        {
+            return _array[index];
+        }
+        if (isEmpty())
+        {
+            throw;
+        }
+        throw std::overflow_error("Index out of range!!!");
+    }
 };
