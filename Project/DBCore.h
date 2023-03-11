@@ -42,4 +42,25 @@ public:
     {
         return _size == 0;
     }
+
+    // append an element to end of the array
+    void append(const T &value)
+    {
+        _size++;
+        std::unique_ptr<T[]> newArray = std::make_unique<T[]>(_size);
+        if (_size <= 1)
+        {
+            newArray[0] = value;
+        }
+        else
+        {
+            for (int i = 0; i < _size - 1; i++)
+            {
+                newArray[i] = _array[i];
+            }
+            newArray[_size - 1] = value;
+        }
+
+        _array = std::move(newArray);
+    }
 };
