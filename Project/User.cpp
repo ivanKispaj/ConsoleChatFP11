@@ -63,3 +63,12 @@ void User::setUserLogin(const std::string &login)
 {
     _login = login;
 }
+
+/// @brief encoding and set the user's password
+/// @param pass unencoded password
+void User::setUserPassword(const std::string &pass)
+{
+    std::string passWord = pass;
+    EncodePassword::encodePassword(passWord);
+    _pass = passWord;
+}
