@@ -72,3 +72,35 @@ void User::setUserPassword(const std::string &pass)
     EncodePassword::encodePassword(passWord);
     _pass = passWord;
 }
+
+void User::copyUserPassword(const std::string &pass)
+{
+    _pass = pass;
+}
+
+void User::addedMesage()
+{
+    _countMessages++;
+    _messageCount = _countMessages;
+}
+
+int User::getMessagesCount() const
+{
+    return _messageCount;
+}
+
+void User::setCurrentID()
+{
+    _currentId++;
+    _id = _currentId;
+}
+
+void User::setUserID(int id)
+{
+    _id = id;
+}
+
+void User::setMessageCout(int cout)
+{
+    _messageCount = cout;
+}
