@@ -1,2 +1,4 @@
 .vscode
 bin
+main.cpp
+.DS_Store
