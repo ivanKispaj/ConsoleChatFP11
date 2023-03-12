@@ -9,7 +9,6 @@
 #include "DBCore.h"
 #include "User.h"
 #include "Message.h"
-#include <iostream>
 
 class DB
 {
@@ -36,4 +35,6 @@ public:
     const std::unique_ptr<Message[]> getAllUserMessageByID(int id) const;
     // Get all user messages by User ID
     const std::unique_ptr<Message[]> getAllMessageByAuthorID(int authorID) const;
+    // Updates the user's data (name, login), except for the password!
+    bool updateUserData(const User &user);
 };

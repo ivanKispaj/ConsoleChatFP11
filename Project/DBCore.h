@@ -5,7 +5,9 @@
 //
 
 #pragma once
-#include <iostream>
+#include <memory>
+#include <utility>
+#include <stdexcept>
 
 template <typename T>
 class DBCore
