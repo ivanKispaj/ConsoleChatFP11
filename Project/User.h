@@ -21,10 +21,13 @@ private:
     int _id{0};
     static int _currentId;
 
-#undef private
-    void setUserPassword(const std::string &pass);  // private method (friend to DB class) sets the user's password in encoded form
+#undef private                                      // private method (friend to DB class)
+    void setUserPassword(const std::string &pass);  // sets the user's password in encoded form
     void copyUserPassword(const std::string &pass); // copy encoded user password
     void setMessageCout(int cout);                  // sets the number of messages when copying
+    void addedMesage();                             // added message count
+    void setCurrentID();                            // Creates a user ID when creating a user
+    void setUserID(int id);                         // sets the user ID when copying the user
 
 public:
     User() = default; // default init without parameters
@@ -37,8 +40,5 @@ public:
     const std::string &getUserPassword() const;  // return the user's password in encoded form
     void setUserName(const std::string &name);   // set the user's name
     void setUserLogin(const std::string &login); // set the user's login
-    void addedMesage();                          // added message count
     int getMessagesCount() const;                // return count message
-    void setCurrentID();
-    void setUserID(int id);
 };
