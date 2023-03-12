@@ -237,3 +237,24 @@ const std::unique_ptr<Message[]> DB::getAllUserMessageByID(int id) const
     }
     return nullptr;
 }
+
+/// @brief Updates the user's data (name, login), except for the password!
+/// @param user struct User
+/// @return true if successful, false if not a unique login, no user, no users
+bool DB::updateUserData(const User &user)
+{
+    if (_userDB.count() > 0 && isUniqueLogin(user.getUserLogin()))
+    {
+        for (int i = 0; i < _userDB.count(); i++)
+        {
+            if (_userDB[i].getUserId() == user.getUserId())
+            {
+                _userDB[i].setUserLogin(user.getUserLogin());
+                _userDB[i].setUserName(user.getUserName());
+                _userDB[i].setMessageCout(user.getMessagesCount());
+                return true;
+            }
+        }
+    }
+    return false;
+}
