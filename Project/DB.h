@@ -9,7 +9,6 @@
 #include "DBCore.h"
 #include "User.h"
 #include "Message.h"
-#include <iostream>
 
 class DB
 {
