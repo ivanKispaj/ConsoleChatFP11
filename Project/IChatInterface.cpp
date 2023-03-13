@@ -10,7 +10,7 @@ Input IChatInterface::login()
     {
         login = getInput<std::string>("Введите логин: ");
         password = getInput<std::string>("Введите пароль: ");
-        auto _user = *db->getUserByLogin(login);
+        user = *db->getUserByLogin(login);
         validate = (&user != nullptr) && db->isCorrectPassword(user.getUserId(), password);
 
         if (!validate)
