@@ -14,7 +14,7 @@ Input ChatUserInterface::run()
             return registration();
             break;
         case 'l':
-            return login();
+            return loginInChat();
         case 'e':
             return close;
         case 'b':
@@ -25,7 +25,15 @@ Input ChatUserInterface::run()
     } while (1);
     return ok;
 }
-
+Input ChatUserInterface::loginInChat()
+{
+    auto loginResult = login();
+    if (loginResult == ok)
+    {
+        return chat();
+    }
+    return loginResult;
+}
 Input ChatUserInterface::registration()
 {
     std::string login;
@@ -39,6 +47,9 @@ Input ChatUserInterface::registration()
     {
         login = getInput<std::string>("Укажите уникальный логин (он будет использоваться для входа): ");
         validLogin = db->isUniqueLogin(login);
+        if(!validLogin){
+            std::cout << "Этот логин занят!" << std::endl;
+        }
     } while (!validLogin);
 
     password = getInput<std::string>("Укажите пароль: ");

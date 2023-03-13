@@ -11,6 +11,7 @@ public:
     /// @brief Первоначальный запуск чата
     /// @return Input result
     Input run() override;
+    Input loginInChat();
     Input registration();
     Input chat();
 };
