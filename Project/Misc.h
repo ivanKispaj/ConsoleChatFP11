@@ -1,11 +1,19 @@
 #pragma once
+#include <iostream>
 #include <string>
 
-class Misc
+/// @brief Реализует ввод данных пользователем
+/// @return T - Введенные данные
+template <typename T>
+T getInput(std::string message);
+
+template <typename T>
+inline T getInput(std::string message)
 {
-public:
-    /// @brief Проверяет строку на соответствие шаблону: A-Z a-z А-Я а-я 0-9
-    /// @param str
-    /// @return bool
-    static bool CheckString(std::string str);
-};
+    T out;
+    std::cout << message;
+    std::cin >> out;
+    std::cin.clear();
+    while (std::cin.get() != '\n') {}
+    return out;
+}
