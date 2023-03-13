@@ -12,7 +12,6 @@ public:
     /// @return int, 0 - выход из программы, 1 - Выйти из чата
     int run() override;
 
-    int registration();
-    int login();
+    int registration();    
     int chat();
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "DB.h"
+#include <iostream>
 
 class IChatInterface
 {
@@ -15,4 +16,5 @@ public:
     }
     virtual ~IChatInterface() = default;
     virtual int run() = 0;
+    int login();
 };
