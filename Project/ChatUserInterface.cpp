@@ -37,7 +37,6 @@ Input ChatUserInterface::registration()
     bool validLogin = false;
     do
     {
-        std::cout << "Укажите уникальный логин (он будет использоваться для входа): ";
         login = getInput<std::string>("Укажите уникальный логин (он будет использоваться для входа): ");
         validLogin = db->isUniqueLogin(login);
     } while (!validLogin);
