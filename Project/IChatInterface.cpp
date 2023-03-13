@@ -1,43 +1,28 @@
 #include "IChatInterface.h"
 
-int IChatInterface::login()
+Input IChatInterface::login()
 {
     std::string login;
     std::string password;
     char endInput = 'y';
-    bool condition = true;
+    bool validate = false;
     do
     {
-        std::cout << "Введите логин: ";
-        std::cin >> login;
+        login = getInput<std::string>("Введите логин: ");
+        password = getInput<std::string>("Введите пароль: ");
+        auto _user = *db->getUserByLogin(login);
+        validate = (&user != nullptr) && db->isCorrectPassword(user.getUserId(), password);
 
-        std::cout << "Введите пароль: ";
-        std::cin >> password;
-        user = *db->getUserByLogin(login);
-        if (&user == nullptr)
+        if (!validate)
         {
-            std::cout << "Неверный логин: " << std::endl;
-            condition = false;
-            std::cout << "Отменить вход? (y - да, n - нет): ";
-            std::cin >> endInput;
+            std::cout << "Неверный логин или пароль: " << std::endl;
+            endInput = getInput<char>("Отменить вход? (y - да, n - нет): ");
             if (endInput == 'y')
             {
-                return 1;
+                return cancel;
             }
             continue;
         }
-        if (!db->isCorrectPassword(user.getUserId(), password))
-        {
-            std::cout << "Неверный пароль: " << std::endl;
-            condition = false;
-            std::cout << "Отменить вход? (y - да, n - нет): ";
-            std::cin >> endInput;
-            if (endInput == 'y')
-            {
-                return 1;
-            }
-            continue;
-        }
-    } while (!condition);
-    return 1;
+    } while (!validate);
+    return ok;
 }
