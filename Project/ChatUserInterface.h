@@ -9,9 +9,8 @@ public:
     ~ChatUserInterface() = default;
 
     /// @brief Первоначальный запуск чата
-    /// @return int, 0 - выход из программы, 1 - Выйти из чата
-    int run() override;
-
-    int registration();    
-    int chat();
+    /// @return Input result
+    Input run() override;
+    Input registration();
+    Input chat();
 };

@@ -8,5 +8,5 @@ public:
     ChatAdminInterface() = default;
     ChatAdminInterface(DB *_db);
     ~ChatAdminInterface() = default;
-    int run() override;
+    Input run() override;
 };
