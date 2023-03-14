@@ -2,6 +2,7 @@
 #include "DB.h"
 #include "Misc.h"
 #include <iostream>
+#include <memory>
 
 enum Input
 {
@@ -21,7 +22,7 @@ class IChatInterface
 {
 protected:
     DB *db;
-    User user;
+    std::unique_ptr<User> user;
     Input status;  
 
 public:

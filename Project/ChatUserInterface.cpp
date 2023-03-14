@@ -70,8 +70,8 @@ Input ChatUserInterface::registration()
 Input ChatUserInterface::chat()
 {
     std::cout << "Вы успешно вошли в чат." << std::endl;
-    std::cout << "Ваше имя: " << user.getUserName() << std::endl;
-    std::cout << "Ваш логин: " << user.getUserLogin() << std::endl;
+    std::cout << "Ваше имя: " << user->getUserName() << std::endl;
+    std::cout << "Ваш логин: " << user->getUserLogin() << std::endl;
     std::cout << "Чат в разработке. До свидания." << std::endl;
     return ok;
 }
