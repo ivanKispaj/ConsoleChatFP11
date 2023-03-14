@@ -8,6 +8,7 @@
 #include <memory>
 #include <utility>
 #include <stdexcept>
+#include "UserNotFoundException.h"
 
 template <typename T>
 class DBCore
