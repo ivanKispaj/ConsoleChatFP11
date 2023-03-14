@@ -27,7 +27,7 @@ public:
     bool isUniqueLogin(const std::string &login);
     bool isCorrectPassword(int userID, const std::string &pass);
     const std::unique_ptr<User[]> getAllUsers() const;
-    const std::unique_ptr<User> getUserByLogin(const std::string &login, bool exception = false) const;
+    const std::unique_ptr<User> getUserByLogin(const std::string &login) const;
     int usersCount() const;
     // Get all messages
     const std::unique_ptr<Message[]> getAllMessage() const;
