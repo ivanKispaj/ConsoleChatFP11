@@ -1,8 +1,8 @@
 #include "ChatUserInterface.h"
-ChatUserInterface::ChatUserInterface(DB *_db) : IChatInterface(_db) {}
 
-Results ChatUserInterface::run()
+Results ChatUserInterface::run(std::unique_ptr<DB> _db)
 {
+    db = std::move(_db);
     char userInput = 'l';
     Results result = empty;
     do
@@ -20,7 +20,7 @@ Results ChatUserInterface::run()
         case 'e':
             result = app_exit;
             break;
-        case 'b':
+        case 's':
             result = back;
             break;
         default:

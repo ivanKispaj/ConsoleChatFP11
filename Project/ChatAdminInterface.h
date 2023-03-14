@@ -6,7 +6,6 @@ private:
     /* data */
 public:
     ChatAdminInterface() = default;
-    ChatAdminInterface(DB *_db);
     ~ChatAdminInterface() = default;
-    Results run() override;
+    Results run(std::unique_ptr<DB> _db) override;
 };

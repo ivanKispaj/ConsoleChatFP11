@@ -29,16 +29,12 @@ enum Results
 class IChatInterface
 {
 protected:
-    DB *db;
     std::unique_ptr<User> user = nullptr;
 
 public:
+    std::unique_ptr<DB> db;
     IChatInterface() = default;
-    IChatInterface(DB *_db)
-    {
-        db = _db;
-    }
     virtual ~IChatInterface() = default;
-    virtual Results run() = 0;
+    virtual Results run(std::unique_ptr<DB> _db) = 0;
     Results login();
 };

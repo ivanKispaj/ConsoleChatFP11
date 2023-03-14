@@ -5,12 +5,12 @@ class ChatUserInterface final : public IChatInterface
 {
 private:
 public:
-    ChatUserInterface(DB *_db);
+    ChatUserInterface() = default;
     ~ChatUserInterface() = default;
 
     /// @brief Первоначальный запуск чата
     /// @return Results
-    Results run() override;
+    Results run(std::unique_ptr<DB> _db) override;
     Results loginInChat();
     Results registration();
     Results chat();

@@ -1,8 +1,8 @@
 #include "ChatAdminInterface.h"
 
-ChatAdminInterface::ChatAdminInterface(DB *_db) : IChatInterface(_db) {}
-
-Results ChatAdminInterface::run()
+Results ChatAdminInterface::run(std::unique_ptr<DB> _db)
 {
-    return Results();
+    db = std::move(_db);
+    login();
+    return empty;
 }

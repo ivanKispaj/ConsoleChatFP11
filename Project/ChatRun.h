@@ -14,12 +14,12 @@ public:
 
 ChatRun::ChatRun()
 {
-    DB *db = new DB();
+    std::unique_ptr<DB> db = std::make_unique<DB>();
     User serviceAdmin("admin", "admin", "1234");
     db->addUser(serviceAdmin);
-    
-    ChatAdminInterface adminInterface(db);
-    ChatUserInterface userInterface(db);
+
+    ChatUserInterface userInterface;
+    ChatAdminInterface adminInterface;
 
     char userInput;
     Results result = empty;
@@ -30,10 +30,12 @@ ChatRun::ChatRun()
         switch (userInput)
         {
         case 'c':
-            result = userInterface.run();
+            result = userInterface.run(std::move(db));
+            db = std::move(userInterface.db);
             break;
         case 'a':
-            result = adminInterface.run();
+            result = adminInterface.run(std::move(db));
+            db = std::move(adminInterface.db);
             break;
         case 'e':
             result = app_exit;
