@@ -1,6 +1,6 @@
 #include "IChatInterface.h"
 
-Input IChatInterface::login()
+Results IChatInterface::login()
 {
     std::string login;
     std::string password;
@@ -25,7 +25,7 @@ Input IChatInterface::login()
             endInput = getInput<char>("Отменить вход? (y - да, n - нет): ");
             if (endInput == 'y')
             {
-                return cancel;
+                return login_cancel;
             }
             continue;
         }
@@ -44,10 +44,10 @@ Input IChatInterface::login()
             endInput = getInput<char>("Отменить вход? (y - да, n - нет): ");
             if (endInput == 'y')
             {
-                return cancel;
+                return login_cancel;
             }
             continue;
         }
     } while (!validate);
-    return ok;
+    return login_success;
 }

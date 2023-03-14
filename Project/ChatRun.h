@@ -17,32 +17,30 @@ ChatRun::ChatRun()
     DB *db = new DB();
     User serviceAdmin("admin", "admin", "1234");
     db->addUser(serviceAdmin);
-
-    ChatUserInterface userInterface(db);
+    
     ChatAdminInterface adminInterface(db);
-    char userInput = 'c';
-    Input inputStatus = empty;
+    ChatUserInterface userInterface(db);
 
-    int exitCode = 0;
+    char userInput;
+    Results result = empty;
+
     do
     {
         userInput = getInput<char>("Выберите действие (с - войти в чат, a - войти в раздел администратора, e - выход из программы): ");
         switch (userInput)
         {
         case 'c':
-            inputStatus = userInterface.run();
+            result = userInterface.run();
             break;
-
         case 'a':
-            inputStatus = adminInterface.run();
+            result = adminInterface.run();
             break;
-
         case 'e':
-            return;
-
+            result = app_exit;
+            break;
         default:
             std::cout << "Неверный ввод" << std::endl;
             break;
         }
-    } while (inputStatus != Input::close);
+    } while (result != Results::app_exit);
 }

@@ -2,7 +2,7 @@
 
 ChatAdminInterface::ChatAdminInterface(DB *_db) : IChatInterface(_db) {}
 
-Input ChatAdminInterface::run()
+Results ChatAdminInterface::run()
 {
-    return Input();
+    return Results();
 }

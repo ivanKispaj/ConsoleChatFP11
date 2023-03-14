@@ -1,40 +1,48 @@
 #include "ChatUserInterface.h"
 ChatUserInterface::ChatUserInterface(DB *_db) : IChatInterface(_db) {}
 
-Input ChatUserInterface::run()
+Results ChatUserInterface::run()
 {
     char userInput = 'l';
-
+    Results result = empty;
     do
     {
-        userInput = getInput<char>("Выберите действия (r - регистрация, l - войти, b - в начало, e - выход из программы): ");
+        // будем оставаться в этом меню после регистрации и логина
+        userInput = getInput<char>("Выберите действия (r - регистрация, l - войти, s - в начало, e - выход из программы): ");
         switch (userInput)
         {
         case 'r':
-            return registration();
+            result = registration();
             break;
         case 'l':
-            return loginInChat();
+            result = loginInChat();
+            break;
         case 'e':
-            return close;
+            result = app_exit;
+            break;
         case 'b':
-            return back;
+            result = back;
+            break;
         default:
+            std::cout << "Неверный ввод" << std::endl;
+            result = empty;
             break;
         }
-    } while (1);
-    return ok;
+    } while (result != app_exit && result != back);
+    return result;
 }
-Input ChatUserInterface::loginInChat()
+
+Results ChatUserInterface::loginInChat()
 {
-    auto loginResult = login();
-    if (loginResult == ok)
+    auto result = login();
+    if (result == login_success)
     {
         return chat();
     }
-    return loginResult;
+    return result;
 }
-Input ChatUserInterface::registration()
+
+Results ChatUserInterface::registration()
 {
     std::string login;
     std::string name;
@@ -47,7 +55,8 @@ Input ChatUserInterface::registration()
     {
         login = getInput<std::string>("Укажите уникальный логин (он будет использоваться для входа): ");
         validLogin = db->isUniqueLogin(login);
-        if(!validLogin){
+        if (!validLogin)
+        {
             std::cout << "Этот логин занят!" << std::endl;
         }
     } while (!validLogin);
@@ -60,18 +69,18 @@ Input ChatUserInterface::registration()
     endInput = getInput<char>("Завершить регистрацию? (y - да, n - отменить): ");
     if (endInput == 'n')
     {
-        return cancel;
+        return register_cancel;
     }
     User user(name, login, password);
     db->addUser(user);
-    return ok;
+    return register_success;
 }
 
-Input ChatUserInterface::chat()
+Results ChatUserInterface::chat()
 {
     std::cout << "Вы успешно вошли в чат." << std::endl;
     std::cout << "Ваше имя: " << user->getUserName() << std::endl;
     std::cout << "Ваш логин: " << user->getUserLogin() << std::endl;
     std::cout << "Чат в разработке. До свидания." << std::endl;
-    return ok;
+    return empty;
 }
