@@ -154,7 +154,7 @@ const std::unique_ptr<User> DB::getUserByLogin(const std::string &login, bool ex
             }
         }
     }
-    else if (exception)
+    if (exception)
     {
         throw UserNotFoundException();
     }

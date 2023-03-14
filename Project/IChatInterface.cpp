@@ -6,17 +6,41 @@ Input IChatInterface::login()
     std::string password;
     char endInput = 'y';
     bool validate = false;
+
+    // ввод логина
     do
     {
         login = getInput<std::string>("Введите логин: ");
+
+        try
+        {
+            std::unique_ptr<User> _user = db->getUserByLogin(login, true);
+            user = std::move(_user);
+            validate = true;
+        }
+        catch (UserNotFoundException &e)
+        {
+            std::cout << e.what() << std::endl;
+
+            endInput = getInput<char>("Отменить вход? (y - да, n - нет): ");
+            if (endInput == 'y')
+            {
+                return cancel;
+            }
+            continue;
+        }
+    } while (!validate);
+
+    // ввод пароля
+    validate = false;
+    do
+    {
         password = getInput<std::string>("Введите пароль: ");
-        std::unique_ptr<User> user1 = db->getUserByLogin(login);
-        user = std::move(user1);
-        validate = (user != nullptr) && db->isCorrectPassword(user->getUserId(), password);
+        validate = db->isCorrectPassword(user->getUserId(), password);
 
         if (!validate)
         {
-            std::cout << "Неверный логин или пароль: " << std::endl;
+            std::cout << "Неверный пароль: " << std::endl;
             endInput = getInput<char>("Отменить вход? (y - да, n - нет): ");
             if (endInput == 'y')
             {

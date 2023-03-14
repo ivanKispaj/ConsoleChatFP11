@@ -6,13 +6,13 @@
 
 enum Input
 {
-    admin = 'a',
-    chat = 'c',
-    close = 'e',
-    back = 'b',
-    start = 's',
-    yes = 'y',
-    no = 'n',
+    admin,
+    chat,
+    close,
+    back,
+    start,
+    yes,
+    no,
     ok,
     wrong,
     empty,
@@ -22,8 +22,7 @@ class IChatInterface
 {
 protected:
     DB *db;
-    std::unique_ptr<User> user;
-    Input status;  
+    std::unique_ptr<User> user = nullptr;
 
 public:
     IChatInterface() = default;
@@ -31,7 +30,7 @@ public:
     {
         db = _db;
     }
-    virtual ~IChatInterface() = default;    
+    virtual ~IChatInterface() = default;
     virtual Input run() = 0;
     Input login();
 };
