@@ -136,9 +136,8 @@ int DB::usersCount() const
     return _userDB.count();
 }
 
-const std::unique_ptr<User> DB::getUserByLogin(const std::string &login) const
+const std::unique_ptr<User> DB::getUserByLogin(const std::string &login, bool exception) const
 {
-
     if (_userDB.count() > 0)
     {
         std::unique_ptr<User> user(new User());
@@ -154,6 +153,10 @@ const std::unique_ptr<User> DB::getUserByLogin(const std::string &login) const
                 return user;
             }
         }
+    }
+    if (exception)
+    {
+        throw UserNotFoundException();
     }
     return nullptr;
 }
