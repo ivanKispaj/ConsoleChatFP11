@@ -36,7 +36,7 @@ Results IChatInterface::login()
     do
     {
         password = getInput<std::string>("Введите пароль: ");
-        validate = db->isCorrectPassword(user->getUserId(), password);
+        validate = db->isCorrectPassword(user->getId(), password);
 
         if (!validate)
         {

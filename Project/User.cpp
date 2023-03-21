@@ -24,7 +24,7 @@ User::User(const std::string &name, const std::string &login, const std::string 
 
 /// @brief  public method
 /// @return return the user's ID
-int User::getUserId() const
+int User::getId() const
 {
     return _id;
 }
@@ -117,4 +117,53 @@ void User::setUserID(int id)
 void User::setMessageCout(int cout)
 {
     _messageCount = cout;
+}
+
+bool User::isAdmin() const
+{
+    return _isAdmin;
+}
+
+bool User::isBanned() const
+{
+    return _isBanned;
+}
+
+bool User::isDeleted() const
+{
+    return _isDeleted;
+}
+
+void User::setIsAdmin(bool isAdmin)
+{
+    _isAdmin = isAdmin;
+}
+
+void User::setIsBannded(bool isBanned)
+{
+    _isBanned = isBanned;
+}
+
+void User::deleteThisData()
+{
+    _name = "deleted";
+    std::string pass = "DeLeTeD";
+    EncodePassword::encodePassword(pass);
+    _pass = pass;
+    _isAdmin = false;
+    _isBanned = false;
+    _isDeleted = true;
+}
+
+User &User::operator=(const User &user)
+{
+    _name = user._name;
+    _login = user._login;
+    _pass = user._pass;
+    _messageCount = user._messageCount;
+    _id = user._id;
+    _isAdmin = user._isAdmin;
+    _isBanned = user._isBanned;
+    _isDeleted = user._isDeleted;
+    return *this;
 }
