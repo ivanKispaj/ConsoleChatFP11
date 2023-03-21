@@ -25,21 +25,15 @@ bool DB::addUser(const std::string &name,
     return false;
 }
 
-bool DB::addUser(const User &user)
+bool DB::addUser(User &user)
 {
     if (isUniqueLogin(user.getUserLogin()))
     {
-        User saveUser(user.getUserName(), user.getUserLogin());
-        saveUser.copyUserPassword(user.getUserPassword());
-        if (user.getUserId() == 0)
+        if (user.getId() == 0)
         {
-            saveUser.setCurrentID();
+            user.setCurrentID();
         }
-        else
-        {
-            saveUser.setUserID(user.getUserId());
-        }
-        _userDB.append(saveUser);
+        _userDB.append(user);
         return true;
     }
     return false;
@@ -51,7 +45,7 @@ void DB::addMessage(const Message &message)
 {
     for (int i = 0; i < _userDB.count(); i++)
     {
-        if (_userDB[i].getUserId() == message.getAuthorID())
+        if (_userDB[i].getId() == message.getAuthorID())
         {
             _userDB[i].addedMesage();
         }
@@ -68,7 +62,7 @@ bool DB::setUserPassword(int userID, const std::string &pass)
 
     for (int i = 0; i < _userDB.count(); i++)
     {
-        if (_userDB[i].getUserId() == userID)
+        if (_userDB[i].getId() == userID)
         {
             _userDB[i].setUserPassword(pass);
             return true;
@@ -100,7 +94,7 @@ bool DB::isCorrectPassword(int userID, const std::string &pass)
 {
     for (int i = 0; i < _userDB.count(); i++)
     {
-        if (_userDB[i].getUserId() == userID)
+        if (_userDB[i].getId() == userID)
         {
             std::string verifyPass = pass;
             EncodePassword::encodePassword(verifyPass);
@@ -145,11 +139,7 @@ const std::unique_ptr<User> DB::getUserByLogin(const std::string &login, bool ex
         {
             if (_userDB[i].getUserLogin() == login)
             {
-                (*user).setUserLogin(_userDB[i].getUserLogin());
-                (*user).setUserName(_userDB[i].getUserName());
-                (*user).setUserPassword(_userDB[i].getUserPassword());
-                (*user).setUserID(_userDB[i].getUserId());
-                (*user).setMessageCout(_userDB[i].getMessagesCount());
+                (*user) = _userDB[i];
                 return user;
             }
         }
@@ -246,18 +236,32 @@ const std::unique_ptr<Message[]> DB::getAllUserMessageByID(int id) const
 /// @return true if successful, false if not a unique login, no user, no users
 bool DB::updateUserData(const User &user)
 {
-    if (_userDB.count() > 0 && isUniqueLogin(user.getUserLogin()))
+    if (_userDB.count() > 0 && !(isUniqueLogin(user.getUserLogin())))
     {
         for (int i = 0; i < _userDB.count(); i++)
         {
-            if (_userDB[i].getUserId() == user.getUserId())
+            if (_userDB[i].getId() == user.getId())
             {
-                _userDB[i].setUserLogin(user.getUserLogin());
-                _userDB[i].setUserName(user.getUserName());
-                _userDB[i].setMessageCout(user.getMessagesCount());
+                _userDB[i] = user;
                 return true;
             }
         }
     }
+    return false;
+}
+
+bool DB::deleteUserAccount(User &user)
+{
+    if (_userDB.count() > 0 && !(isUniqueLogin(user.getUserLogin())))
+    {
+        if (user.isDeleted())
+        {
+            return true;
+        }
+        user.deleteThisData();
+        _userDB.operator--(user.getId());
+        return true;
+    }
+
     return false;
 }

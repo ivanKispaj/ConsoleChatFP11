@@ -21,7 +21,7 @@ public:
     bool addUser(const std::string &name,
                  const std::string &login,
                  const std::string &pass);
-    bool addUser(const User &user);
+    bool addUser(User &user);
     void addMessage(const Message &message);
     bool setUserPassword(int userID, const std::string &pass);
     bool isUniqueLogin(const std::string &login);
@@ -37,4 +37,5 @@ public:
     const std::unique_ptr<Message[]> getAllMessageByAuthorID(int authorID) const;
     // Updates the user's data (name, login), except for the password!
     bool updateUserData(const User &user);
+    bool deleteUserAccount(User &user); // true -> if accaunt deleted, false -> failed
 };

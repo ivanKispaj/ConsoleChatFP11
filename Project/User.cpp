@@ -24,7 +24,7 @@ User::User(const std::string &name, const std::string &login, const std::string 
 
 /// @brief  public method
 /// @return return the user's ID
-int User::getUserId() const
+int User::getId() const
 {
     return _id;
 }
@@ -64,7 +64,7 @@ void User::setUserLogin(const std::string &login)
     _login = login;
 }
 
-/// @brief encoding and set the user's password
+/// @brief encoding and set the user's password this is private method, the DB class has access to
 /// @param pass unencoded password
 void User::setUserPassword(const std::string &pass)
 {
@@ -73,34 +73,97 @@ void User::setUserPassword(const std::string &pass)
     _pass = passWord;
 }
 
+/// @brief copies the already encoded password to the user property ( needed when the object is copied )
+///        private method, the DB class has access to
+/// @param pass
 void User::copyUserPassword(const std::string &pass)
 {
     _pass = pass;
 }
 
+/// @brief increases the message counter when adding messages to the database (DB)
+///        private method, the DB class has access to
 void User::addedMesage()
 {
     _countMessages++;
     _messageCount = _countMessages;
 }
 
+/// @brief To get the number of messages from the user - outgoing/incoming
+/// @return int outgoing/incoming count
 int User::getMessagesCount() const
 {
     return _messageCount;
 }
 
+/// @brief Creates a user ID when creating a user
+///        private method, the DB class has access to
 void User::setCurrentID()
 {
     _currentId++;
     _id = _currentId;
 }
 
+/// @brief sets the user ID when copying the user
+///        private method, the DB class has access to
+/// @param id int
 void User::setUserID(int id)
 {
     _id = id;
 }
 
+/// @brief sets the number of messages the user has when copying it
+/// @param cout int
 void User::setMessageCout(int cout)
 {
     _messageCount = cout;
+}
+
+bool User::isAdmin() const
+{
+    return _isAdmin;
+}
+
+bool User::isBanned() const
+{
+    return _isBanned;
+}
+
+bool User::isDeleted() const
+{
+    return _isDeleted;
+}
+
+void User::setIsAdmin(bool isAdmin)
+{
+    _isAdmin = isAdmin;
+}
+
+void User::setIsBannded(bool isBanned)
+{
+    _isBanned = isBanned;
+}
+
+void User::deleteThisData()
+{
+    _name = "deleted";
+    std::string pass = "DeLeTeD";
+    EncodePassword::encodePassword(pass);
+    _pass = pass;
+    _isAdmin = false;
+    _isBanned = false;
+    _isDeleted = true;
+}
+
+User &User::operator=(const User &user)
+{
+    _name = user._name;
+    _login = user._login;
+    _pass = user._pass;
+    _messageCount = user._messageCount;
+    _id = user._id;
+    _isAdmin = user._isAdmin;
+    _isBanned = user._isBanned;
+    _isDeleted = user._isDeleted;
+    return *this;
 }

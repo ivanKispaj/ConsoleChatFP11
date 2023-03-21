@@ -99,4 +99,19 @@ nullptr if array is empry or index out if range..
         }
         throw std::overflow_error("Index out of range!!!");
     }
+
+    DBCore<T> &operator--(int ID)
+    {
+        if (_size > 0)
+        {
+            for (int i = 0; i < _size; i++)
+            {
+                if (_array[i].getId() == ID)
+                {
+                    _array[i].deleteThisData();
+                }
+            }
+        }
+        return *this;
+    }
 };
