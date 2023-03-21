@@ -3,6 +3,7 @@
 #include "Misc.h"
 #include <iostream>
 #include <memory>
+#include "UserInput.h"
 
 /**
  * Чат имеет ветвистую структуру, пользователь будет постоянно перемещаться по различным диалогам.
@@ -26,6 +27,8 @@ enum Results
     empty,
     chat,
     admin,
+    registration,
+    login,
 };
 
 class IChatInterface

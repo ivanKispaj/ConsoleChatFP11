@@ -3,39 +3,39 @@
 Results ChatUserInterface::run(std::unique_ptr<DB> _db)
 {
     db = std::move(_db);
-    char userInput = 'l';
-    Results result = empty;
+    Results userInput = Results::empty;
+    Results result = Results::empty;
+    UserInput<std::string, Results> chatAreaPage("Страница авторизации и регистрации",
+                                             "Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
+                                             "Неверный ввод", 4);
+    chatAreaPage.addInputs("р", "вх", "н", "вых");
+    chatAreaPage.addOutputs(Results::registration, Results::login, Results::back, Results::app_exit);
     do
     {
-        // будем оставаться в этом меню после регистрации и логина
-        userInput = getInput<char>("Выберите действия (r - регистрация, l - войти, s - в начало, e - выход из программы): ");
+        userInput = chatAreaPage.IOAction();
         switch (userInput)
         {
-        case 'r':
+        case Results::registration:
             result = registration();
             break;
-        case 'l':
+        case Results::login:
             result = loginInChat();
             break;
-        case 'e':
-            result = app_exit;
+        case Results::back:
+            result = Results::back;
             break;
-        case 's':
-            result = back;
-            break;
-        default:
-            std::cout << "Неверный ввод" << std::endl;
-            result = empty;
+        case Results::app_exit:
+            result = Results::app_exit;
             break;
         }
-    } while (result != app_exit && result != back);
+    } while (result != Results::app_exit && result != Results::back);
     return result;
 }
 
 Results ChatUserInterface::loginInChat()
 {
     auto result = login();
-    if (result == login_success)
+    if (result == Results::login_success)
     {
         return chat();
     }
@@ -49,11 +49,19 @@ Results ChatUserInterface::registration()
     std::string password;
 
     std::cout << "Вы находитесь в меню регистрации" << std::endl;
+    UserInput<std::string , std::string> getLogin("Страница регистрации", "Введите логин: ");
+    UserInput<std::string , std::string> getName(std::string(), "Введите отображаемое имя пользователя: ");
+    UserInput<std::string , std::string> getPass(std::string(), "Введите пароль: ");
+    UserInput<std::string , Results> regEnd(std::string(), "Выберите действие (з - Зарегистрироваться, о - Отменить регистрацию): ", "Неверный ввод", 2);
+    regEnd.addInputs("з", "о");
+    regEnd.addOutputs(Results::register_success, Results::register_cancel);
 
+    // логин
     bool validLogin = false;
     do
     {
-        login = getInput<std::string>("Укажите уникальный логин (он будет использоваться для входа): ");
+        login = getLogin.throughIOAction();
+
         validLogin = db->isUniqueLogin(login);
         if (!validLogin)
         {
@@ -61,15 +69,15 @@ Results ChatUserInterface::registration()
         }
     } while (!validLogin);
 
-    password = getInput<std::string>("Укажите пароль: ");
-    name = getInput<std::string>("Укажите отображаемое имя пользователя: ");
+    password = getPass.throughIOAction();
+    name = getName.throughIOAction();
 
-    char endInput = 'y';
+    Results endInput;
 
-    endInput = getInput<char>("Завершить регистрацию? (y - да, n - отменить): ");
-    if (endInput == 'n')
+    endInput = regEnd.IOAction();
+    if (endInput == Results::register_cancel)
     {
-        return register_cancel;
+        return Results::register_cancel;
     }
     User user(name, login, password);
     db->addUser(user);
