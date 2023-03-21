@@ -6,8 +6,8 @@ Results ChatUserInterface::run(std::unique_ptr<DB> _db)
     Results userInput = Results::empty;
     Results result = Results::empty;
     UserInput<std::string, Results> chatAreaPage("Страница авторизации и регистрации",
-                                             "Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
-                                             "Неверный ввод", 4);
+                                                 "Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
+                                                 "Неверный ввод", 4);
     chatAreaPage.addInputs("р", "вх", "н", "вых");
     chatAreaPage.addOutputs(Results::registration, Results::login, Results::back, Results::app_exit);
     do
@@ -49,10 +49,10 @@ Results ChatUserInterface::registration()
     std::string password;
 
     std::cout << "Вы находитесь в меню регистрации" << std::endl;
-    UserInput<std::string , std::string> getLogin("Страница регистрации", "Введите логин: ");
-    UserInput<std::string , std::string> getName(std::string(), "Введите отображаемое имя пользователя: ");
-    UserInput<std::string , std::string> getPass(std::string(), "Введите пароль: ");
-    UserInput<std::string , Results> regEnd(std::string(), "Выберите действие (з - Зарегистрироваться, о - Отменить регистрацию): ", "Неверный ввод", 2);
+    UserInput<std::string, std::string> getLogin("Страница регистрации", "Введите логин: ");
+    UserInput<std::string, std::string> getName(std::string(), "Введите отображаемое имя пользователя: ");
+    UserInput<std::string, std::string> getPass(std::string(), "Введите пароль: ");
+    UserInput<std::string, Results> regEnd(std::string(), "Выберите действие (з - Зарегистрироваться, о - Отменить регистрацию): ", "Неверный ввод", 2);
     regEnd.addInputs("з", "о");
     regEnd.addOutputs(Results::register_success, Results::register_cancel);
 
@@ -86,9 +86,22 @@ Results ChatUserInterface::registration()
 
 Results ChatUserInterface::chat()
 {
+    std::cout << "Здравствуйте, " << user->getUserName() << "!" << std::endl;
     std::cout << "Вы успешно вошли в чат." << std::endl;
-    std::cout << "Ваше имя: " << user->getUserName() << std::endl;
-    std::cout << "Ваш логин: " << user->getUserLogin() << std::endl;
-    std::cout << "Чат в разработке. До свидания." << std::endl;
+    std::string page;
+    std::string pages;
+    std::string mainMessage;
+
+    db->getAllMessage();
+
+    UserInput<std::string, Results> regEnd("Общий чат",
+                                           "Выберите действие:\n"
+                                           "с - написать сообщение;\n"
+                                           "н - настройки;",
+                                           "Неверный ввод",
+
+                                           2);
+    regEnd.addInputs("з", "о");
+    regEnd.addOutputs(Results::register_success, Results::register_cancel);
     return empty;
 }
