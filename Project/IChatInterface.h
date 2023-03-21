@@ -23,7 +23,9 @@ enum Results
     no,
     app_exit,
     back,
-    empty
+    empty,
+    chat,
+    admin,
 };
 
 class IChatInterface
