@@ -29,17 +29,10 @@ bool DB::addUser(User &user)
 {
     if (isUniqueLogin(user.getUserLogin()))
     {
-        // User saveUser(user.getUserName(), user.getUserLogin());
-        // saveUser.copyUserPassword(user.getUserPassword());
         if (user.getId() == 0)
         {
-            // saveUser.setCurrentID();
             user.setCurrentID();
         }
-        // else
-        // {
-        //     saveUser.setUserID(user.getUserId());
-        // }
         _userDB.append(user);
         return true;
     }
@@ -250,9 +243,6 @@ bool DB::updateUserData(const User &user)
             if (_userDB[i].getId() == user.getId())
             {
                 _userDB[i] = user;
-                // _userDB[i].setUserLogin(user.getUserLogin());
-                // _userDB[i].setUserName(user.getUserName());
-                // _userDB[i].setMessageCout(user.getMessagesCount());
                 return true;
             }
         }
