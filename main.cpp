@@ -2,5 +2,5 @@
 int main()
 {
     ChatRun run;
+    return 0;
 }
-// нажать F5 чтобы запустить этот файл
