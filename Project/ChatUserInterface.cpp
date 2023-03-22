@@ -94,21 +94,24 @@ Results ChatUserInterface::chat()
     int start = 0;
     int end = 0;
 
-    std::string chatDescription = "[" + user->getUserName() +
-                                  "] Общий чат. Сообщения " + std::to_string(start) + " - " + std::to_string(end);
+    std::string chatDescription = user->getUserName() + " [" + user->getUserLogin() +
+                                  "] Общий чат. Сообщения: " +
+                                  std::to_string(start) + " - " +
+                                  std::to_string(end) + " из " +
+                                  std::to_string(msgMaxCount);
     std::string mainMessage = "Выберите действие:\n"
                               "с - написать сообщение;\n"
                               "н - настройки;";
 
     db->getAllMessage();
 
-    UserInput<std::string, Results> chatMainPage(chatDescription,
-                                                 mainMessage,
-                                                 "Неверный ввод",
-
-                                                 2);
+    UserInput<std::string, Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 2);
     chatMainPage.addInputs("з", "о");
     chatMainPage.addOutputs(Results::register_success, Results::register_cancel);
-    chatMainPage.IOAction();
+
+    do
+    {
+        chatMainPage.IOAction();
+    } while (1);
     return empty;
 }
