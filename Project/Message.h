@@ -74,6 +74,11 @@ struct Message
     /// @brief  set message unique id
     void setMessageId();
 
+    /// @brief Overloading the assignment operator "="
+    /// @param message Message to assign struct "Message"
+    /// @return Message
+    Message &operator=(const Message &message);
+
 private:
     std::string _message;
     int _authorID = 0;

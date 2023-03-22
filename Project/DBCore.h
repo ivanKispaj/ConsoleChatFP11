@@ -114,4 +114,29 @@ nullptr if array is empry or index out if range..
         }
         return *this;
     }
+
+    void deleteById(int Id)
+    {
+        if (_size > 0)
+        {
+            std::unique_ptr<T[]> temporaryArray = std::make_unique<T[]>(_size);
+            int size = 0;
+            for (int i = 0; i < _size; i++)
+            {
+                if (_array[i].getId() != Id)
+                {
+                    temporaryArray[size] = _array[i];
+                    size++;
+                }
+            }
+            _array = nullptr;
+            _array = std::make_unique<T[]>(size);
+            for (int i = 0; i < size; i++)
+            {
+                _array[i] = temporaryArray[i];
+            }
+            _size = size;
+
+        }
+    }
 };
