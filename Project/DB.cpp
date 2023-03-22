@@ -7,9 +7,6 @@
 #include "DB.h"
 #include "EncodePassword.h"
 
-/// @brief added new user to DB
-/// @param user struct User type
-/// @return true - if is success, false if login non-unique!
 bool DB::addUser(const std::string &name,
                  const std::string &login,
                  const std::string &pass)
@@ -39,24 +36,52 @@ bool DB::addUser(User &user)
     return false;
 }
 
-/// @brief added message to DB
-/// @param message struct Message type
-void DB::addMessage(const Message &message)
+void DB::addMessage(Message &message)
 {
-    for (int i = 0; i < _userDB.count(); i++)
+    if (message.getAuthorID() != 0 && message.getRecipientID() != 0)
     {
-        if (_userDB[i].getId() == message.getAuthorID())
+        message.isPrivat = true;
+        for (int i = 0; i < _userDB.count(); i++)
         {
-            _userDB[i].addedMesage();
+            if (_userDB[i].getId() == message.getAuthorID())
+            {
+                _userDB[i].addedMesage();
+            }
+
+            if (_userDB[i].getId() == message.getRecipientID())
+            {
+                _userDB[i].addedMesage();
+            }
         }
+        message.setDateMessage();
+        message.setMessageId();
+        _messageDB.append(message);
     }
-    _messageDB.append(message);
 }
 
-/// @brief Sets the user account password
-/// @param userID int unique id
-/// @param pass std::string new password
-/// @return true - if is success, false - if there is no user with this id
+void DB::AddMessageToAllUsers(Message &message)
+{
+    if (message.getAuthorID() != 0)
+    {
+        message.isPrivat = false;
+        for (int i = 0; i < _userDB.count(); i++)
+        {
+            if (_userDB[i].getId() != message.getAuthorID())
+            {
+                message.setRecipientID(_userDB[i].getId());
+            }
+            else
+            {
+                message.setRecipientID(0);
+            }
+            _userDB[i].addedMesage();
+            message.setDateMessage();
+            message.setMessageId();
+            _messageDB.append(message);
+        }
+    }
+}
+
 bool DB::setUserPassword(int userID, const std::string &pass)
 {
 
@@ -71,9 +96,6 @@ bool DB::setUserPassword(int userID, const std::string &pass)
     return false;
 }
 
-/// @brief Checks whether the login is unique.
-/// @param login std::string.
-/// @return true - if login unique, false - if the login exists.
 bool DB::isUniqueLogin(const std::string &login)
 {
     for (int i = 0; i < _userDB.count(); i++)
@@ -86,10 +108,6 @@ bool DB::isUniqueLogin(const std::string &login)
     return true;
 }
 
-/// @brief checks whether passwords match or not
-/// @param userID int ID user
-/// @param pass std::string incoming password
-/// @return true - if the passwords match, false - if the passwords are different
 bool DB::isCorrectPassword(int userID, const std::string &pass)
 {
     for (int i = 0; i < _userDB.count(); i++)
@@ -107,8 +125,6 @@ bool DB::isCorrectPassword(int userID, const std::string &pass)
     return false;
 }
 
-/// @brief Returns an array of users
-/// @return  if the array is not empty - std::unique_ptr<User[]> , nullptr if the array is empty!
 const std::unique_ptr<User[]> DB::getAllUsers() const
 {
     if (_userDB.count() > 0)
@@ -121,13 +137,6 @@ const std::unique_ptr<User[]> DB::getAllUsers() const
         return std::move(ret);
     }
     return nullptr;
-}
-
-/// @brief Returns the size of the user array
-/// @return  int user array size
-int DB::usersCount() const
-{
-    return _userDB.count();
 }
 
 const std::unique_ptr<User> DB::getUserByLogin(const std::string &login, bool exception) const
@@ -151,8 +160,11 @@ const std::unique_ptr<User> DB::getUserByLogin(const std::string &login, bool ex
     return nullptr;
 }
 
-/// @brief Returns an array of all messages
-/// @return if the array is not empty - std::unique_ptr<Message[]>, nullptr if the array is empty!
+int DB::usersCount() const
+{
+    return _userDB.count();
+}
+
 const std::unique_ptr<Message[]> DB::getAllMessage() const
 {
     if (_messageDB.count() > 0)
@@ -167,42 +179,7 @@ const std::unique_ptr<Message[]> DB::getAllMessage() const
     return nullptr;
 }
 
-/// @brief Returns an array of all messages for authorID
-/// @param authorID int unique author ID
-/// @return if the array is not empty - std::unique_ptr<Message[]>, nullptr if the array is empty!
-const std::unique_ptr<Message[]> DB::getAllMessageByAuthorID(int authorID) const
-{
-    DBCore<Message> newMessageArray;
-    if (_messageDB.count() > 0)
-    {
-
-        bool issetMessage = false;
-        for (int i = 0; i < _messageDB.count(); i++)
-        {
-            if (_messageDB[i].getAuthorID() == authorID)
-            {
-                newMessageArray.append(_messageDB[i]);
-                issetMessage = true;
-            }
-        }
-        if (issetMessage)
-        {
-            std::unique_ptr<Message[]> ret(new Message[newMessageArray.count()]);
-            for (int i = 0; i < newMessageArray.count(); i++)
-            {
-                ret[i] = newMessageArray[i];
-            }
-
-            return std::move(ret);
-        }
-    }
-    return nullptr;
-}
-
-/// @brief Returns an array of all messages for recipientID
-/// @param recipientID int unique recipientID
-/// @return if the array is not empty - std::unique_ptr<Message[]>, nullptr if the array is empty!
-const std::unique_ptr<Message[]> DB::getAllUserMessageByID(int id) const
+const std::unique_ptr<Message[]> DB::getAllMessageForUserById(int id) const
 {
     DBCore<Message> newMessageArray;
 
@@ -231,9 +208,6 @@ const std::unique_ptr<Message[]> DB::getAllUserMessageByID(int id) const
     return nullptr;
 }
 
-/// @brief Updates the user's data (name, login), except for the password!
-/// @param user struct User
-/// @return true if successful, false if not a unique login, no user, no users
 bool DB::updateUserData(const User &user)
 {
     if (_userDB.count() > 0 && !(isUniqueLogin(user.getUserLogin())))
@@ -242,7 +216,8 @@ bool DB::updateUserData(const User &user)
         {
             if (_userDB[i].getId() == user.getId())
             {
-                _userDB[i] = user;
+                _userDB[i].setUserName(user.getUserName());
+                _userDB[i].setUserLogin(user.getUserLogin());
                 return true;
             }
         }

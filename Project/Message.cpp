@@ -5,6 +5,9 @@
 //
 
 #include "Message.h"
+#include <chrono>
+
+long long int Message::_currentId;
 
 void Message::setMessage(const std::string &message)
 {
@@ -34,4 +37,28 @@ int Message::getAuthorID() const
 int Message::getRecipientID() const
 {
     return _recipientID;
+}
+
+long long int Message::getId() const
+{
+    return _id;
+}
+
+long long int Message::getDate() const
+{
+    return _date;
+}
+
+// Private methods for Friends "DB"
+void Message::setDateMessage()
+{
+    using namespace std::chrono;
+    long long int sec = int(duration_cast<seconds>(system_clock::now().time_since_epoch()).count());
+    _date = sec;
+}
+
+void Message::setMessageId()
+{
+    _currentId++;
+    _id = _currentId;
 }
