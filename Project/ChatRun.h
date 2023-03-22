@@ -4,6 +4,7 @@
 #include "ChatUserInterface.h"
 #include "ChatAdminInterface.h"
 #include "Misc.h"
+#include "UserInput.h"
 class ChatRun
 {
 private:
@@ -21,28 +22,40 @@ ChatRun::ChatRun()
     ChatUserInterface userInterface;
     ChatAdminInterface adminInterface;
 
-    char userInput;
+    Results userInput;
     Results result = empty;
+    // Объект страницы
+    UserInput<std::string, Results> coreAreaPage("Главная станица",
+                                             "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",
+                                             "Неверный ввод",
+                                             3 // количество возможных вариантов ввода
+    );
+
+    // создание возможных вариантов ввода
+    coreAreaPage.addInputs("ч", "а", "в");
+    // Соответствующие варианты вывода
+    coreAreaPage.addOutputs(Results::chat, Results::admin, Results::app_exit);
 
     do
     {
-        userInput = getInput<char>("Выберите действие (с - войти в чат, a - войти в раздел администратора, e - выход из программы): ");
+        userInput = coreAreaPage.IOAction();
         switch (userInput)
         {
-        case 'c':
+        case Results::chat:
             result = userInterface.run(std::move(db));
             db = std::move(userInterface.db);
             break;
-        case 'a':
+        case Results::admin:
             result = adminInterface.run(std::move(db));
             db = std::move(adminInterface.db);
             break;
-        case 'e':
-            result = app_exit;
+        case Results::app_exit:
+            result = Results::app_exit;
             break;
         default:
             std::cout << "Неверный ввод" << std::endl;
             break;
         }
     } while (result != Results::app_exit);
+    std::cout << "Вы вышли из чата. До свидания." << std::endl;
 }
