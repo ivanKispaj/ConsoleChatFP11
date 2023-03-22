@@ -67,8 +67,12 @@ public:
     O IOAction();
 
     /// @brief Отображает страницу обработки сквозного ввода пользователя output = input
-    /// @return 
+    /// @return
     I throughIOAction();
+
+    void setDescription(std::string newText);
+    void setMainMessage(std::string newText);
+    void setFailMessage(std::string newText);
 };
 
 template <typename I, typename O>
@@ -96,7 +100,8 @@ inline UserInput<I, O>::UserInput(std::string description, std::string mainMessa
 template <typename I, typename O>
 inline O UserInput<I, O>::IOAction()
 {
-    if(throughIO){
+    if (throughIO)
+    {
         throw "Multiple input is disabled. Use throughIOAction() method.";
     }
     // Множественный ввод
@@ -137,6 +142,24 @@ inline I UserInput<I, O>::throughIOAction()
     {
     }
     return throughInput;
+}
+
+template <typename I, typename O>
+inline void UserInput<I, O>::setDescription(std::string newText)
+{
+    Description = newText;
+}
+
+template <typename I, typename O>
+inline void UserInput<I, O>::setMainMessage(std::string newText)
+{
+    MainMessage = newText;
+}
+
+template <typename I, typename O>
+inline void UserInput<I, O>::setFailMessage(std::string newText)
+{
+    FailMessage = newText;
 }
 
 template <typename I, typename O>
