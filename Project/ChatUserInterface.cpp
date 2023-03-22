@@ -88,20 +88,27 @@ Results ChatUserInterface::chat()
 {
     std::cout << "Здравствуйте, " << user->getUserName() << "!" << std::endl;
     std::cout << "Вы успешно вошли в чат." << std::endl;
-    std::string page;
-    std::string pages;
-    std::string mainMessage;
+    int pageNumber = 0;
+    int msgPerPages = 0;
+    int msgMaxCount = 0;
+    int start = 0;
+    int end = 0;
+
+    std::string chatDescription = "[" + user->getUserName() +
+                                  "] Общий чат. Сообщения " + std::to_string(start) + " - " + std::to_string(end);
+    std::string mainMessage = "Выберите действие:\n"
+                              "с - написать сообщение;\n"
+                              "н - настройки;";
 
     db->getAllMessage();
 
-    UserInput<std::string, Results> regEnd("Общий чат",
-                                           "Выберите действие:\n"
-                                           "с - написать сообщение;\n"
-                                           "н - настройки;",
-                                           "Неверный ввод",
+    UserInput<std::string, Results> chatMainPage(chatDescription,
+                                                 mainMessage,
+                                                 "Неверный ввод",
 
-                                           2);
-    regEnd.addInputs("з", "о");
-    regEnd.addOutputs(Results::register_success, Results::register_cancel);
+                                                 2);
+    chatMainPage.addInputs("з", "о");
+    chatMainPage.addOutputs(Results::register_success, Results::register_cancel);
+    chatMainPage.IOAction();
     return empty;
 }
