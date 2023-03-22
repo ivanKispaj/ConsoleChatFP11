@@ -122,9 +122,9 @@ void User::setMessageCout(int cout)
     _messageCount = cout;
 }
 
-void User::addedMesage()
+void User::addedMesage(int count)
 {
-    _messageCount++;
+    _messageCount = _messageCount + count;
 }
 
 void User::setCurrentID()
@@ -136,4 +136,12 @@ void User::setCurrentID()
 void User::setUserID(int id)
 {
     _id = id;
+}
+
+void User::deletedMessage()
+{
+    if (_messageCount > 0)
+    {
+        _messageCount--;
+    }
 }

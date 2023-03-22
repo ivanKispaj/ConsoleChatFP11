@@ -16,6 +16,8 @@ bool DB::addUser(const std::string &name,
         User user(name, login);
         user.setUserPassword(pass);
         user.setCurrentID();
+        int countMessages = addMessagesToNewUserFromPublicChat(user.getId());
+        user.addedMesage(countMessages);
         _userDB.append(user);
         return true;
     }
@@ -30,7 +32,10 @@ bool DB::addUser(User &user)
         {
             user.setCurrentID();
         }
+        int countMessages = addMessagesToNewUserFromPublicChat(user.getId());
+        user.addedMesage(countMessages);
         _userDB.append(user);
+
         return true;
     }
     return false;
@@ -64,6 +69,8 @@ void DB::AddMessageToAllUsers(Message &message)
     if (message.getAuthorID() != 0)
     {
         message.isPrivat = false;
+        message.setDateMessage();
+        message.setMessageId();
         for (int i = 0; i < _userDB.count(); i++)
         {
             if (_userDB[i].getId() != message.getAuthorID())
@@ -75,8 +82,6 @@ void DB::AddMessageToAllUsers(Message &message)
                 message.setRecipientID(0);
             }
             _userDB[i].addedMesage();
-            message.setDateMessage();
-            message.setMessageId();
             _messageDB.append(message);
         }
     }
@@ -239,4 +244,73 @@ bool DB::deleteUserAccount(User &user)
     }
 
     return false;
+}
+
+bool DB::deleteMessageById(int Id)
+{
+    if (_messageDB.count() > 0)
+    {
+        for (int i = 0; i < _messageDB.count(); i++)
+        {
+            if (_messageDB[i].getId() == Id)
+            {
+                int authorId = _messageDB[i].getAuthorID();
+                int recipientId = _messageDB[i].getRecipientID();
+
+                for (int i = 0; i < _userDB.count(); i++)
+                {
+                    if (_userDB[i].getId() == authorId || _userDB[i].getId() == recipientId)
+                    {
+                        _userDB[i].deletedMessage();
+                    }
+                }
+            }
+        }
+        _messageDB.deleteById(Id);
+        return true;
+    }
+    return false;
+}
+
+// Private methods
+bool DB::isUsedId(std::unique_ptr<int[]> &arrayId, int id, int size) const
+{
+    if (size > 0)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            if (arrayId[i] == id)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int DB::addMessagesToNewUserFromPublicChat(int id)
+{
+    int count{0};
+    int messageCount = _messageDB.count();
+    Message message;
+
+    std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
+    if (_messageDB.count() > 0)
+    {
+        for (int i = 0; i < messageCount; i++)
+        {
+            if (!(_messageDB[i].isPrivat))
+            {
+                if (_messageDB[i].getRecipientID() != id && _messageDB[i].getRecipientID() != 0 && !isUsedId(arrayId, _messageDB[i].getId(), count))
+                {
+                    message = _messageDB[i];
+                    message.setRecipientID(id);
+                    _messageDB.append(message);
+                    arrayId[count] = message.getId();
+                    count++;
+                }
+            }
+        }
+    }
+    return count;
 }

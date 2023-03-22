@@ -15,6 +15,18 @@ class DB
     DBCore<User> _userDB;       // database User
     DBCore<Message> _messageDB; // database Message
 
+    /// @brief private method : Adds public messages to newly registered users
+    /// @param id int user id
+    /// @return
+    int addMessagesToNewUserFromPublicChat(int id);
+
+    /// @brief private method :
+    /// @param arrayId Array of numbers
+    /// @param id int The number to check
+    /// @param size Array size
+    /// @return true If the "id" is present in the array
+    bool isUsedId(std::unique_ptr<int[]> &arrayId, int id, int size) const;
+
 public:
     /// @brief default init
     DB() = default;
@@ -93,4 +105,9 @@ public:
     /// @param user struct User
     /// @return true if successful, false if not a unique login, no user, no users
     bool deleteUserAccount(User &user); // true -> if accaunt deleted, false -> failed
+
+    /// @brief
+    /// @param message
+    /// @return
+    bool deleteMessageById(int Id);
 };

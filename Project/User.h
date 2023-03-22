@@ -40,7 +40,7 @@ private:
 
     /// @brief increases the message counter when adding messages to the database (DB)
     ///        private method, the DB class has access to
-    void addedMesage();
+    void addedMesage(int count = 1);
 
     /// @brief Creates a user ID when creating a user
     ///        private method, the DB class has access to
@@ -50,6 +50,9 @@ private:
     ///        private method, the DB class has access to
     /// @param id int
     void setUserID(int id);
+
+    /// @brief deleted user count message
+    void deletedMessage();
 
 public:
     // default init without parameters
@@ -119,6 +122,7 @@ public:
 
     /// @brief Erases user data , except for ID and Login, or it will false
     void deleteThisData();
+
     /// @brief Overloading the assignment operator "="
     /// @param user User to assign struct "User"
     /// @return User

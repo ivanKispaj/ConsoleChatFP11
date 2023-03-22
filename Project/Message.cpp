@@ -49,6 +49,17 @@ long long int Message::getDate() const
     return _date;
 }
 
+Message &Message::operator=(const Message &message)
+{
+    isPrivat = message.isPrivat;
+    _message = message.getMessage();
+    _authorID = message.getAuthorID();
+    _recipientID = message.getRecipientID();
+    _date = message.getDate();
+    _id = message.getId();
+    return *this;
+}
+
 // Private methods for Friends "DB"
 void Message::setDateMessage()
 {
