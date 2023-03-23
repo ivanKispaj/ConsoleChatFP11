@@ -314,3 +314,70 @@ int DB::addMessagesToNewUserFromPublicChat(int id)
     }
     return count;
 }
+
+const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUsersById(int user1Id, int user2Id, int &size) const
+{
+    DBCore<Message> newMessageArray;
+
+    if (_messageDB.count() > 0)
+    {
+        bool issetMessage = false;
+        for (int i = 0; i < _messageDB.count(); i++)
+        {
+            if (((_messageDB[i].getAuthorID() == user1Id) && (_messageDB[i].getRecipientID() == user2Id)) || ((_messageDB[i].getAuthorID() == user2Id) && (_messageDB[i].getRecipientID() == user1Id)))
+            {
+                if (_messageDB[i].isPrivat)
+                {
+                    newMessageArray.append(_messageDB[i]);
+                    issetMessage = true;
+                }
+            }
+        }
+        if (issetMessage)
+        {
+            std::unique_ptr<Message[]> ret(new Message[newMessageArray.count()]);
+            for (int i = 0; i < newMessageArray.count(); i++)
+            {
+                ret[i] = newMessageArray[i];
+            }
+            size = newMessageArray.count();
+            return std::move(ret);
+        }
+    }
+    return nullptr;
+}
+
+const std::unique_ptr<Message[]> DB::getAllPublicMessagesForUserById(int Id, int &size) const
+{
+    DBCore<Message> newMessageArray;
+    int count{0};
+    std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
+    if (_messageDB.count() > 0)
+    {
+        bool issetMessage = false;
+        for (int i = 0; i < _messageDB.count(); i++)
+        {
+            if ((_messageDB[i].getAuthorID() == Id) || (_messageDB[i].getRecipientID() == Id))
+            {
+                if (!_messageDB[i].isPrivat && !isUsedId(arrayId, _messageDB[i].getId(), count))
+                {
+                    newMessageArray.append(_messageDB[i]);
+                    issetMessage = true;
+                    arrayId[count] = _messageDB[i].getId();
+                    count++;
+                }
+            }
+        }
+        if (issetMessage)
+        {
+            std::unique_ptr<Message[]> ret(new Message[newMessageArray.count()]);
+            for (int i = 0; i < newMessageArray.count(); i++)
+            {
+                ret[i] = newMessageArray[i];
+            }
+            size = newMessageArray.count();
+            return std::move(ret);
+        }
+    }
+    return nullptr;
+}
