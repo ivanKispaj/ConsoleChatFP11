@@ -381,3 +381,37 @@ const std::unique_ptr<Message[]> DB::getAllPublicMessagesForUserById(int Id, int
     }
     return nullptr;
 }
+
+const std::unique_ptr<Message[]> DB::getAllPublicMessages(int &size) const
+{
+    DBCore<Message> newMessageArray;
+    int count{0};
+    std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
+
+    if (_messageDB.count() > 0)
+    {
+        bool issetMessage = false;
+
+        for (int i = 0; i < _messageDB.count(); i++)
+        {
+            if (!_messageDB[i].isPrivat && !isUsedId(arrayId, _messageDB[i].getId(), count))
+            {
+                newMessageArray.append(_messageDB[i]);
+                issetMessage = true;
+                arrayId[count] = _messageDB[i].getId();
+                count++;
+            }
+        }
+        if (issetMessage)
+        {
+            std::unique_ptr<Message[]> ret(new Message[newMessageArray.count()]);
+            for (int i = 0; i < newMessageArray.count(); i++)
+            {
+                ret[i] = newMessageArray[i];
+            }
+            size = newMessageArray.count();
+            return std::move(ret);
+        }
+    }
+    return nullptr;
+}

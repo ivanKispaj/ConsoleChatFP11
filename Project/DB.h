@@ -115,12 +115,17 @@ public:
     /// @param user1Id int ID of the first user
     /// @param user2Id int ID of the second user
     /// @param size the reference is the size of the array, the created size of the array will be written to it
-    /// @return
+    /// @return std::unique_ptr<Message[]> Returns an array
     const std::unique_ptr<Message[]> getAllPrivateMessagesForUsersById(int user1Id, int user2Id, int &size) const;
 
     /// @brief Returns an array of all incoming/outgoing Public messages between users with ID in chronological ascending order
     /// @param Id int ID of the user
     /// @param size the reference is the size of the array, the created size of the array will be written to it
-    /// @return
+    /// @return std::unique_ptr<Message[]> Returns an array
     const std::unique_ptr<Message[]> getAllPublicMessagesForUserById(int Id, int &size) const;
+
+    /// @brief Returns an array of all incoming/outgoing Public chronological ascending order
+    /// @param size the reference is the size of the array, the created size of the array will be written to it
+    /// @return std::unique_ptr<Message[]> Returns an array
+    const std::unique_ptr<Message[]> getAllPublicMessages(int &size) const;
 };
