@@ -86,32 +86,89 @@ Results ChatUserInterface::registration()
 
 Results ChatUserInterface::chat()
 {
+    // system(clear);
+    std::cout << std::endl;
     std::cout << "Здравствуйте, " << user->getUserName() << "!" << std::endl;
     std::cout << "Вы успешно вошли в чат." << std::endl;
-    int pageNumber = 0;
-    int msgPerPages = 0;
+    std::cout << std::endl;
+    std::string chatDescription;
+    std::string mainMessage;
+
+    mainMessage = "Выберите действие:\n"
+                  "с - написать сообщение;\n"
+                  "н - настройки;\n"
+                  "в - выход;\n";
+
+    UserInput<std::string, Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 3);
+    chatMainPage.addInputs("с", "н", "в");
+    chatMainPage.addOutputs(Results::send_message, Results::chat_options, Results::back);
+
+    int pageNumber = 1;
+    int msgPerPages = 10;
+    int msgPerPagesOption = 10;
     int msgMaxCount = 0;
     int start = 0;
     int end = 0;
-
-    std::string chatDescription = user->getUserName() + " [" + user->getUserLogin() +
-                                  "] Общий чат. Сообщения: " +
-                                  std::to_string(start) + " - " +
-                                  std::to_string(end) + " из " +
-                                  std::to_string(msgMaxCount);
-    std::string mainMessage = "Выберите действие:\n"
-                              "с - написать сообщение;\n"
-                              "н - настройки;";
-
-    db->getAllMessage();
-
-    UserInput<std::string, Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 2);
-    chatMainPage.addInputs("з", "о");
-    chatMainPage.addOutputs(Results::register_success, Results::register_cancel);
-
+    int maxPageNumber = pageNumber;
+    Results result;
+    std::string uName;
+    std::string uLogin;
+    std::string uID;
     do
     {
-        chatMainPage.IOAction();
-    } while (1);
+        auto messages = db->getAllPublicMessages(msgMaxCount);
+        if (messages == nullptr)
+        {
+            std::cout << "В этом чате нет сообщений. Начните общение первым." << std::endl;
+        }
+        msgPerPages = 10;
+        pagination(msgMaxCount, msgPerPages, maxPageNumber, &start, &end, &maxPageNumber);
+
+        for (int i{start}; i < end && messages != nullptr; i++)
+        {
+            auto msgUser = db->getUserById(messages[i].getAuthorID());
+
+            std::cout << std::endl;
+            std::cout
+                << "[" << messages[i].getId() << "] "
+                << msgUser->getUserName()
+                << "[" << msgUser->getUserLogin() << "]"
+                << "\t[" << std::to_string(msgUser->getId()) << "]"
+                << std::endl;
+            std::cout << messages[i].getMessage() << std::endl;
+        }
+        std::cout << std::endl;
+        chatDescription = user->getUserName() + " [" + user->getUserLogin() +
+                          "] Общий чат. Показаны сообщения: " +
+                          std::to_string(start + 1) + " - " +
+                          std::to_string(end) + " из " +
+                          std::to_string(msgMaxCount);
+        chatMainPage.setDescription(chatDescription);
+
+        result = chatMainPage.IOAction();
+        switch (result)
+        {
+        case Results::send_message:
+            sendMessage();
+            break;
+
+        default:
+            break;
+        }
+        system(clear);
+    } while (result != Results::back);
     return empty;
+}
+
+void ChatUserInterface::sendMessage()
+{
+    Message message;
+    std::string messageText;
+    std::cout << "Введите текст сообщения: ";
+    std::getline(std::cin, messageText);
+
+    message.setAuthorID(user->getId());
+    message.setMessage(messageText);
+
+    db->AddMessageToAllUsers(message);
 }

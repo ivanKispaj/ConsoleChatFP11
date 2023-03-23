@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include "UserInput.h"
+const extern char clear[];
 
 /**
  * Чат имеет ветвистую структуру, пользователь будет постоянно перемещаться по различным диалогам.
@@ -29,6 +30,8 @@ enum Results
     admin,
     registration,
     login,
+    send_message,
+    chat_options,
 };
 
 class IChatInterface
@@ -52,5 +55,5 @@ public:
     /// @param pageNumber Номер страницы
     /// @param start Для сохранения первого элемента страницы
     /// @param end Для сохранения второго элемента страницы
-    void pagination(int *maxMsgs, int *msgPerPage, int *pageNumber, int *start, int *end);
+    void pagination(int maxMsgs, int msgPerPage, int pageNumber, int *start, int *end, int *maxPageNumber);
 };

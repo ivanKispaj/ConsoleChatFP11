@@ -178,7 +178,7 @@ const std::unique_ptr<User> DB::getUserById(const int &userID) const
                 return user;
             }
         }
-    }    
+    }
     return nullptr;
 }
 

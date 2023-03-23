@@ -52,25 +52,49 @@ Results IChatInterface::login()
     return login_success;
 }
 
-void IChatInterface::pagination(int *maxMsgs, int *msgPerPage, int *pageNumber, int *start, int *end)
+/*
+Алгоритм пагинатора:
+
+*start end - начинают отсчет с нуля.
+*если массив пустой - start == end == 0. В этом случае условие в цикле i=start; i<end не сработает
+*если в массиве один элемент maxMsgs == 1 - start = 0 end = 1, тогда условие цикла сработает 1 раз.
+*если в массиве 2 элемента maxMsgs == 2. start = 0 end = 2. end = start + msgPerPage
+*Вывод: если массив не пустой, end = start + msgPerPage
+*если пустой start == 0 && end == 0 - выход
+
+
+*/
+void IChatInterface::pagination(int maxMsgs, int msgPerPage, int pageNumber, int *start, int *end, int *maxPageNumber)
 {
+    // Если пустой массив
+    if (maxMsgs == 0)
+    {
+        *start = 0;
+        *end = 0;
+        return;
+    }
+
     // количество сообщений на страницу не должно превышать максимального количества сообщений
-    if (*msgPerPage > *maxMsgs)
+    if (msgPerPage > maxMsgs)
     {
         msgPerPage = maxMsgs;
     }
     // максимально возможный номер страницы, урезается если введен превышающий диапазон
-    int maxPageNumber = (*maxMsgs / *msgPerPage) + 1;
-    if (*pageNumber > maxPageNumber)
+    *maxPageNumber = (maxMsgs / msgPerPage) + 1;
+    if (pageNumber > *maxPageNumber)
     {
-        *pageNumber = maxPageNumber;
+        pageNumber = *maxPageNumber;
     }
+
     // первое сообщение страницы
-    *start = *msgPerPage * (*pageNumber - 1);
+    *start = msgPerPage * (pageNumber - 1);
     // конечное сообщение в странице
-    *end = *start + *msgPerPage;
-    if (*end > *maxMsgs)
+    *end = *start + msgPerPage;
+
+    // если msgPerPage превысил максимум
+    if (*end > maxMsgs)
     {
-        *end = *maxMsgs;
+        *start = maxMsgs - msgPerPage;
+        *end = maxMsgs;
     }
 }
