@@ -16,11 +16,10 @@ private:
     std::string FailMessage;
     int ioCount = 0;
     int ioLength = 0;
-    std::unique_ptr<I[]> inputs;
-    std::unique_ptr<O[]> outputs;
-    bool throughIO; // output = input
-    bool matchedIO; // inputs[n] -> outputs[n]
-    bool filterInput;
+    std::unique_ptr<I[]> inputs = nullptr;
+    std::unique_ptr<O[]> outputs = nullptr;
+    bool throughIO = false; // output = input
+    bool matchedIO = false; // inputs[n] -> outputs[n]
     void addInputs(){};
     void addOutputs(){};
 
@@ -30,12 +29,13 @@ public:
     /// @param mainMessage - Сообщение пользователю
     /// @param failMessage - Сообщение при неверном вводе
     /// @param ioCapacity - Количество возможных вариантов ввода
-    UserInput(std::string description, std::string mainMessage, std::string failMessage, int ioCapacity = 1);
+    UserInput(std::string description, std::string mainMessage, std::string failMessage, int ioCapacity);
 
     /// @brief Создает страницу сквозного пользовательского ввода. output = input.
     /// @param description - Заголовок страницы
     /// @param mainMessage - Сообщение пользователю
-    UserInput(std::string description, std::string mainMessage);
+    /// @param failMessage - Сообщение при неверном вводе
+    UserInput(std::string description, std::string mainMessage, std::string failMessage);
     UserInput() = default;
     ~UserInput() = default;
 
@@ -62,13 +62,21 @@ public:
     template <typename IO, typename... Args>
     void addIO(IO value, Args... args);
 
-    /// @brief Отображает страницу обработки множественного ввода пользователя
+    /// @brief Отображает страницу обработки множественного ввода пользователя. Использует std::cin
     /// @return
-    O IOAction();
+    O IOcin();
 
-    /// @brief Отображает страницу обработки сквозного ввода пользователя output = input
+    /// @brief Отображает страницу обработки сквозного ввода пользователя output = input. Использует std::cin
     /// @return
-    I throughIOAction();
+    I IOcinThrough();
+
+    /// @brief Отображает страницу обработки множественного ввода пользователя. Использует std::getline
+    /// @return
+    O IOgetline();
+    /// @brief Отображает страницу обработки сквозного ввода пользователя output = input. Использует std::getline
+    /// @param denyEmpty true - запретить пустой ввод, по умолчанию false
+    /// @return
+    std::string IOgetlineThrough(bool denyEmpty = false);
 
     void setDescription(std::string newText);
     void setMainMessage(std::string newText);
@@ -88,21 +96,22 @@ inline UserInput<I, O>::UserInput(std::string description, std::string mainMessa
 }
 
 template <typename I, typename O>
-inline UserInput<I, O>::UserInput(std::string description, std::string mainMessage)
+inline UserInput<I, O>::UserInput(std::string description, std::string mainMessage, std::string failMessage)
 {
     Description = description;
     MainMessage = mainMessage;
+    FailMessage = failMessage;
     throughIO = true;
     inputs = std::make_unique<I[]>(1);
     outputs = std::make_unique<O[]>(1);
 }
 
 template <typename I, typename O>
-inline O UserInput<I, O>::IOAction()
+inline O UserInput<I, O>::IOcin()
 {
     if (throughIO)
     {
-        throw "Multiple input is disabled. Use throughIOAction() method.";
+        throw "Multiple input is disabled. Use IOcinThrough() method.";
     }
     // Множественный ввод
     I userInput;
@@ -131,7 +140,7 @@ inline O UserInput<I, O>::IOAction()
 }
 
 template <typename I, typename O>
-inline I UserInput<I, O>::throughIOAction()
+inline I UserInput<I, O>::IOcinThrough()
 {
     // Сквозной ввод
     I throughInput;
@@ -141,6 +150,56 @@ inline I UserInput<I, O>::throughIOAction()
     while (std::cin.get() != '\n')
     {
     }
+    return throughInput;
+}
+
+template <typename I, typename O>
+inline O UserInput<I, O>::IOgetline()
+{
+    if (throughIO)
+    {
+        throw "Multiple input is disabled. Use IOgetlineThrough() method.";
+    }
+    // Множественный ввод
+    std::string userInput;
+    do
+    {
+        if (!Description.empty())
+        {
+            std::cout << Description << std::endl;
+        }
+        std::cout << MainMessage;
+        std::getline(std::cin, userInput);
+
+        for (int i{0}; i < ioLength; i++)
+        {
+            if (userInput == inputs[i])
+            {
+                return outputs[i];
+            }
+        }
+        std::cout << FailMessage << std::endl;
+    } while (1);
+}
+
+template <typename I, typename O>
+inline std::string UserInput<I, O>::IOgetlineThrough(bool denyEmpty)
+{
+    // Сквозной ввод
+    std::string throughInput;
+    do
+    {
+        std::cout << MainMessage;
+        std::getline(std::cin, throughInput);
+        if (denyEmpty && throughInput.empty())
+        {
+            std::cout << FailMessage << std::endl;
+        }
+        else
+        {
+            denyEmpty = false;
+        }
+    } while (denyEmpty);
     return throughInput;
 }
 
