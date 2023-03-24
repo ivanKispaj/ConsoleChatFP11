@@ -11,10 +11,8 @@ long long int User::_currentId;
 
 // Public methods
 
-User::User(const std::string &name, const std::string &login, const std::string &pass)
+User::User(const std::string &name, const std::string &login, const std::string &pass) : _name(name), _login(login)
 {
-    _name = name;
-    _login = login;
     setUserPassword(pass);
     setCurrentID();
 }

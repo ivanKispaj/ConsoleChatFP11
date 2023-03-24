@@ -24,10 +24,8 @@ public:
     ~DBCore() = default;
 
     //  Copy construction
-    DBCore<T>(const DBCore &array)
+    DBCore<T>(const DBCore &array) : _size(array._size), _array(_array = std::make_unique<T[]>(array._size))
     {
-        _size = array._size;
-        _array = std::make_unique<T[]>(array._size);
         for (int i = 0; i < _size; i++)
         {
             _array[i] = array._array[i];
@@ -79,10 +77,6 @@ nullptr if array is empry or index out if range..
         {
             return _array[index];
         }
-        if (isEmpty())
-        {
-            throw;
-        }
         throw std::overflow_error("Index out of range!!!");
     }
 
@@ -92,10 +86,6 @@ nullptr if array is empry or index out if range..
         if (index >= 0 && index < _size)
         {
             return _array[index];
-        }
-        if (isEmpty())
-        {
-            throw;
         }
         throw std::overflow_error("Index out of range!!!");
     }
@@ -136,7 +126,6 @@ nullptr if array is empry or index out if range..
                 _array[i] = temporaryArray[i];
             }
             _size = size;
-
         }
     }
 };

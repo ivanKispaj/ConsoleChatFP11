@@ -25,7 +25,7 @@ class DB
     /// @param id int The number to check
     /// @param size Array size
     /// @return true If the "id" is present in the array
-    bool isUsedId(std::unique_ptr<int[]> &arrayId, int id, int size) const;
+    bool isUsedId(std::unique_ptr<int[]> const &arrayId, int id, int size) const;
 
 public:
     /// @brief default init

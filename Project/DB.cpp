@@ -139,7 +139,7 @@ const std::unique_ptr<User[]> DB::getAllUsers() const
         {
             ret[i] = _userDB[i];
         }
-        return std::move(ret);
+        return ret;
     }
     return nullptr;
 }
@@ -196,7 +196,7 @@ const std::unique_ptr<Message[]> DB::getAllMessage() const
         {
             ret[i] = _messageDB[i];
         }
-        return std::move(ret);
+        return ret;
     }
     return nullptr;
 }
@@ -223,8 +223,7 @@ const std::unique_ptr<Message[]> DB::getAllMessageForUserById(int id) const
             {
                 ret[i] = newMessageArray[i];
             }
-
-            return std::move(ret);
+            return ret;
         }
     }
     return nullptr;
@@ -259,7 +258,6 @@ bool DB::deleteUserAccount(User &user)
         _userDB.operator--(user.getId());
         return true;
     }
-
     return false;
 }
 
@@ -274,11 +272,11 @@ bool DB::deleteMessageById(int Id)
                 int authorId = _messageDB[i].getAuthorID();
                 int recipientId = _messageDB[i].getRecipientID();
 
-                for (int i = 0; i < _userDB.count(); i++)
+                for (int index = 0; index < _userDB.count(); index++)
                 {
-                    if (_userDB[i].getId() == authorId || _userDB[i].getId() == recipientId)
+                    if (_userDB[index].getId() == authorId || _userDB[index].getId() == recipientId)
                     {
-                        _userDB[i].deletedMessage();
+                        _userDB[index].deletedMessage();
                     }
                 }
             }
@@ -290,7 +288,7 @@ bool DB::deleteMessageById(int Id)
 }
 
 // Private methods
-bool DB::isUsedId(std::unique_ptr<int[]> &arrayId, int id, int size) const
+bool DB::isUsedId(std::unique_ptr<int[]> const &arrayId, int id, int size) const
 {
     if (size > 0)
     {
@@ -308,12 +306,12 @@ bool DB::isUsedId(std::unique_ptr<int[]> &arrayId, int id, int size) const
 int DB::addMessagesToNewUserFromPublicChat(int id)
 {
     int count{0};
-    int messageCount = _messageDB.count();
-    Message message;
-
-    std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
     if (_messageDB.count() > 0)
     {
+        std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
+        int messageCount = _messageDB.count();
+        Message message;
+
         for (int i = 0; i < messageCount; i++)
         {
             if (!(_messageDB[i].isPrivat))
@@ -334,11 +332,11 @@ int DB::addMessagesToNewUserFromPublicChat(int id)
 
 const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUsersById(int user1Id, int user2Id, int &size) const
 {
-    DBCore<Message> newMessageArray;
-
     if (_messageDB.count() > 0)
     {
+        DBCore<Message> newMessageArray;
         bool issetMessage = false;
+
         for (int i = 0; i < _messageDB.count(); i++)
         {
             if (((_messageDB[i].getAuthorID() == user1Id) && (_messageDB[i].getRecipientID() == user2Id)) || ((_messageDB[i].getAuthorID() == user2Id) && (_messageDB[i].getRecipientID() == user1Id)))
@@ -358,7 +356,7 @@ const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUsersById(int user1
                 ret[i] = newMessageArray[i];
             }
             size = newMessageArray.count();
-            return std::move(ret);
+            return ret;
         }
     }
     return nullptr;
@@ -366,12 +364,14 @@ const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUsersById(int user1
 
 const std::unique_ptr<Message[]> DB::getAllPublicMessagesForUserById(int Id, int &size) const
 {
-    DBCore<Message> newMessageArray;
-    int count{0};
-    std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
+
     if (_messageDB.count() > 0)
     {
+        DBCore<Message> newMessageArray;
         bool issetMessage = false;
+        int count{0};
+        std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
+
         for (int i = 0; i < _messageDB.count(); i++)
         {
             if ((_messageDB[i].getAuthorID() == Id) || (_messageDB[i].getRecipientID() == Id))
@@ -393,7 +393,7 @@ const std::unique_ptr<Message[]> DB::getAllPublicMessagesForUserById(int Id, int
                 ret[i] = newMessageArray[i];
             }
             size = newMessageArray.count();
-            return std::move(ret);
+            return ret;
         }
     }
     return nullptr;
@@ -401,13 +401,13 @@ const std::unique_ptr<Message[]> DB::getAllPublicMessagesForUserById(int Id, int
 
 const std::unique_ptr<Message[]> DB::getAllPublicMessages(int &size) const
 {
-    DBCore<Message> newMessageArray;
-    int count{0};
-    std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
 
     if (_messageDB.count() > 0)
     {
+        DBCore<Message> newMessageArray;
         bool issetMessage = false;
+        int count{0};
+        std::unique_ptr<int[]> arrayId = std::make_unique<int[]>(_messageDB.count());
 
         for (int i = 0; i < _messageDB.count(); i++)
         {
@@ -427,7 +427,7 @@ const std::unique_ptr<Message[]> DB::getAllPublicMessages(int &size) const
                 ret[i] = newMessageArray[i];
             }
             size = newMessageArray.count();
-            return std::move(ret);
+            return ret;
         }
     }
     return nullptr;
