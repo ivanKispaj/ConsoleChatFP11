@@ -3,6 +3,8 @@
 #include "Misc.h"
 #include <iostream>
 #include <memory>
+#include "UserInput.h"
+const extern char clear[];
 
 /**
  * Чат имеет ветвистую структуру, пользователь будет постоянно перемещаться по различным диалогам.
@@ -23,7 +25,13 @@ enum Results
     no,
     app_exit,
     back,
-    empty
+    empty,
+    chat,
+    admin,
+    registration,
+    login,
+    send_message,
+    chat_options,
 };
 
 class IChatInterface
@@ -36,5 +44,16 @@ public:
     IChatInterface() = default;
     virtual ~IChatInterface() = default;
     virtual Results run(std::unique_ptr<DB> _db) = 0;
+
+    /// @brief Проверяет логин и пароль при входе пользователя.
+    /// @return
     Results login();
+
+    /// @brief Пагинатор. Высчитывает начальный и конечный индексы диапазона элементов в массиве
+    /// @param maxMsgs Максимальное количество элементов
+    /// @param msgPerPage Количество элементов в странице
+    /// @param pageNumber Номер страницы
+    /// @param start Для сохранения первого элемента страницы
+    /// @param end Для сохранения второго элемента страницы
+    void pagination(int maxMsgs, int msgPerPage, int pageNumber, int *start, int *end, int *maxPageNumber);
 };

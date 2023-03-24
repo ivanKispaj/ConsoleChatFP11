@@ -83,6 +83,11 @@ public:
     /// @return Returning a pointer to a user object
     const std::unique_ptr<User> getUserByLogin(const std::string &login, bool exception = false) const;
 
+    /// @brief Get a user by ID
+    /// @param userId
+    /// @return
+    const std::unique_ptr<User> getUserById(const int &userId) const;
+
     /// @brief Returns the size of the user array
     /// @return  int user array size
     int usersCount() const;

@@ -165,6 +165,23 @@ const std::unique_ptr<User> DB::getUserByLogin(const std::string &login, bool ex
     return nullptr;
 }
 
+const std::unique_ptr<User> DB::getUserById(const int &userID) const
+{
+    if (_userDB.count() > 0)
+    {
+        std::unique_ptr<User> user(new User());
+        for (int i = 0; i < _userDB.count(); i++)
+        {
+            if (_userDB[i].getId() == userID)
+            {
+                (*user) = _userDB[i];
+                return user;
+            }
+        }
+    }
+    return nullptr;
+}
+
 int DB::usersCount() const
 {
     return _userDB.count();

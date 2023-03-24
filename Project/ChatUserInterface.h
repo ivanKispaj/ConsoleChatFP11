@@ -14,4 +14,5 @@ public:
     Results loginInChat();
     Results registration();
     Results chat();
+    void sendMessage();
 };
