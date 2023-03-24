@@ -3,7 +3,6 @@
 #include "IChatInterface.h"
 #include "ChatUserInterface.h"
 #include "ChatAdminInterface.h"
-#include "Misc.h"
 #include "UserInput.h"
 #define test(a) ;
 
@@ -44,8 +43,8 @@ ChatRun::ChatRun()
     db->AddMessageToAllUsers(msg);
 #endif
 
-    Results userInput;
-    Results result = empty;
+    Results userInput = Results::empty;
+    Results result = Results::empty;
     // Объект страницы
     UserInput<std::string, Results> coreAreaPage("Главная станица",
                                                  "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",
@@ -60,7 +59,7 @@ ChatRun::ChatRun()
 
     do
     {
-        userInput = coreAreaPage.IOAction();
+        userInput = coreAreaPage.IOgetline();
         switch (userInput)
         {
         case Results::chat:
