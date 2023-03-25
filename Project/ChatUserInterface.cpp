@@ -12,7 +12,8 @@ Results ChatUserInterface::run(std::unique_ptr<DB> _db)
     chatAreaPage.addOutputs(Results::registration, Results::login, Results::back, Results::app_exit);
     do
     {
-        userInput = chatAreaPage.IOAction();
+        system(clear);
+        userInput = chatAreaPage.IOgetline();
         switch (userInput)
         {
         case Results::registration:
@@ -26,6 +27,8 @@ Results ChatUserInterface::run(std::unique_ptr<DB> _db)
             break;
         case Results::app_exit:
             result = Results::app_exit;
+            break;
+        default:
             break;
         }
     } while (result != Results::app_exit && result != Results::back);
@@ -48,10 +51,11 @@ Results ChatUserInterface::registration()
     std::string name;
     std::string password;
 
+    std::string incorrectInput = "Неверный ввод. Пустые значения недопустимы.";
     std::cout << "Вы находитесь в меню регистрации" << std::endl;
-    UserInput<std::string, std::string> getLogin("Страница регистрации", "Введите логин: ");
-    UserInput<std::string, std::string> getName(std::string(), "Введите отображаемое имя пользователя: ");
-    UserInput<std::string, std::string> getPass(std::string(), "Введите пароль: ");
+    UserInput<std::string, std::string> getLogin("Страница регистрации", "Введите логин: ", incorrectInput);
+    UserInput<std::string, std::string> getName(std::string(), "Введите отображаемое имя пользователя: ", incorrectInput);
+    UserInput<std::string, std::string> getPass(std::string(), "Введите пароль: ", incorrectInput);
     UserInput<std::string, Results> regEnd(std::string(), "Выберите действие (з - Зарегистрироваться, о - Отменить регистрацию): ", "Неверный ввод", 2);
     regEnd.addInputs("з", "о");
     regEnd.addOutputs(Results::register_success, Results::register_cancel);
@@ -60,7 +64,7 @@ Results ChatUserInterface::registration()
     bool validLogin = false;
     do
     {
-        login = getLogin.throughIOAction();
+        login = getLogin.IOgetlineThrough(true);
 
         validLogin = db->isUniqueLogin(login);
         if (!validLogin)
@@ -69,12 +73,12 @@ Results ChatUserInterface::registration()
         }
     } while (!validLogin);
 
-    password = getPass.throughIOAction();
-    name = getName.throughIOAction();
+    password = getPass.IOgetlineThrough(true);
+    name = getName.IOgetlineThrough(true);
 
     Results endInput;
 
-    endInput = regEnd.IOAction();
+    endInput = regEnd.IOgetline();
     if (endInput == Results::register_cancel)
     {
         return Results::register_cancel;
@@ -121,7 +125,6 @@ Results ChatUserInterface::chat()
         {
             std::cout << "В этом чате нет сообщений. Начните общение первым." << std::endl;
         }
-        msgPerPages = 10;
         pagination(msgMaxCount, msgPerPages, maxPageNumber, &start, &end, &maxPageNumber);
 
         for (int i{start}; i < end && messages != nullptr; i++)
@@ -145,7 +148,7 @@ Results ChatUserInterface::chat()
                           std::to_string(msgMaxCount);
         chatMainPage.setDescription(chatDescription);
 
-        result = chatMainPage.IOAction();
+        result = chatMainPage.IOgetline();
         switch (result)
         {
         case Results::send_message:
@@ -164,8 +167,8 @@ void ChatUserInterface::sendMessage()
 {
     Message message;
     std::string messageText;
-    std::cout << "Введите текст сообщения: ";
-    std::getline(std::cin, messageText);
+    UserInput<std::string, std::string> send(std::string(), "Введите текст сообщения: ", "Неверный ввод. Пустые значения недопустимы.");
+    messageText = send.IOgetlineThrough(true);
 
     message.setAuthorID(user->getId());
     message.setMessage(messageText);
