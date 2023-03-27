@@ -2,7 +2,7 @@
 
 Results IChatInterface::login()
 {
-    std::string _login;    
+    std::string _login;
     Results endInput = Results::empty;
     std::string incorrectInput = "Неверный ввод. Пустые значения недопустимы.";
 
@@ -54,37 +54,49 @@ Results IChatInterface::login()
     return login_success;
 }
 
-void IChatInterface::pagination(int maxMsgs, int msgPerPage, int pageNumber, int *start, int *end, int *maxPageNumber)
+void IChatInterface::pagination()
 {
     // Если пустой массив
-    if (maxMsgs == 0)
+    if (msgMaxCount == 0)
     {
-        *start = 0;
-        *end = 0;
+        msgStart = 0;
+        msgEnd = 0;
         return;
     }
 
     // количество сообщений на страницу не должно превышать максимального количества сообщений
-    if (msgPerPage > maxMsgs)
+    if (msgPerPage >= msgMaxCount)
     {
-        msgPerPage = maxMsgs;
+        msgStart = 0;
+        msgEnd = msgMaxCount;
+        return;
     }
+
     // максимально возможный номер страницы, урезается если введен превышающий диапазон
-    *maxPageNumber = (maxMsgs / msgPerPage) + 1;
-    if (pageNumber > *maxPageNumber)
+    maxPageNumber = (msgMaxCount / msgPerPage) + 1;
+    if (pageNumber > maxPageNumber)
     {
-        pageNumber = *maxPageNumber;
+        pageNumber = maxPageNumber;
     }
 
-    // первое сообщение страницы
-    *start = msgPerPage * (pageNumber - 1);
-    // конечное сообщение в странице
-    *end = *start + msgPerPage;
-
-    // если msgPerPage превысил максимум
-    if (*end > maxMsgs)
+    // если запрошена страница
+    if (paginationMode == PaginationMode::page)
     {
-        *start = maxMsgs - msgPerPage;
-        *end = maxMsgs;
+        msgStart = msgPerPage * (pageNumber - 1);
+        msgEnd = msgStart + msgPerPage;
+    }
+
+    // если запрошен показ страницы от конкретного сообщения
+    if (paginationMode == PaginationMode::message)
+    {
+        msgEnd = msgStart + msgPerPage;
+    }
+
+    // msgStart + msgPerPage превысил максимум или запрошена последняя страница
+    // будут отображаться последние msgPerPage сообщений
+    if ((msgEnd > msgMaxCount) || (paginationMode == PaginationMode::last_page))
+    {
+        msgStart = msgMaxCount - msgPerPage;
+        msgEnd = msgMaxCount;
     }
 }

@@ -107,17 +107,8 @@ Results ChatUserInterface::chat()
     chatMainPage.addInputs("с", "н", "в");
     chatMainPage.addOutputs(Results::send_message, Results::chat_options, Results::back);
 
-    int pageNumber = 1;
-    int msgPerPages = 10;
-    int msgPerPagesOption = 10;
-    int msgMaxCount = 0;
-    int start = 0;
-    int end = 0;
-    int maxPageNumber = pageNumber;
     Results result;
-    std::string uName;
-    std::string uLogin;
-    std::string uID;
+
     do
     {
         auto messages = db->getAllPublicMessages(msgMaxCount);
@@ -125,9 +116,9 @@ Results ChatUserInterface::chat()
         {
             std::cout << "В этом чате нет сообщений. Начните общение первым." << std::endl;
         }
-        pagination(msgMaxCount, msgPerPages, maxPageNumber, &start, &end, &maxPageNumber);
+        pagination();
 
-        for (int i{start}; i < end && messages != nullptr; i++)
+        for (int i{msgStart}; i < msgEnd && messages != nullptr; i++)
         {
             auto msgUser = db->getUserById(messages[i].getAuthorID());
 
@@ -143,8 +134,8 @@ Results ChatUserInterface::chat()
         std::cout << std::endl;
         chatDescription = user->getUserName() + " [" + user->getUserLogin() +
                           "] Общий чат. Показаны сообщения: " +
-                          std::to_string(start + 1) + " - " +
-                          std::to_string(end) + " из " +
+                          std::to_string(msgStart + 1) + " - " +
+                          std::to_string(msgEnd) + " из " +
                           std::to_string(msgMaxCount);
         chatMainPage.setDescription(chatDescription);
 
@@ -154,7 +145,9 @@ Results ChatUserInterface::chat()
         case Results::send_message:
             sendMessage();
             break;
-
+        case Results::chat_options:
+            chatOptions();
+            break;
         default:
             break;
         }
@@ -174,4 +167,10 @@ void ChatUserInterface::sendMessage()
     message.setMessage(messageText);
 
     db->AddMessageToAllUsers(message);
+}
+
+void ChatUserInterface::chatOptions()
+{
+    UserInput<int, int> startMessage(std::string(), "Укажите номер первого сообщения: ", "Неверный ввод.");
+    UserInput<int, int> perPage(std::string(), "Укажите количество сообщений: ", "Неверный ввод.");
 }
