@@ -37,6 +37,7 @@ enum PaginationMode{
     page,
     last_page,
     message,
+    msg_per_page,
 };
 
 class IChatInterface
@@ -45,12 +46,12 @@ protected:
     std::unique_ptr<User> user = nullptr;
 
     // настройки пагинации
-    PaginationMode paginationMode = PaginationMode::message;
+    PaginationMode paginationMode = PaginationMode::last_page;
     int pageNumber = 1;    
     int msgMaxCount = 0;
-    int msgPerPage = 23;
+    int msgPerPage = 10;
     int maxPageNumber = 0;
-    int msgStart = 37;
+    int msgStart = 0;
     int msgEnd = 0;
 
 public:

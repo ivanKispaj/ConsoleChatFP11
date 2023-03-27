@@ -56,6 +56,14 @@ Results IChatInterface::login()
 
 void IChatInterface::pagination()
 {
+    if (msgStart < 0)
+    {
+        msgStart = 0;
+    }
+    if (pageNumber < 1)
+    {
+        pageNumber = 1;
+    }
     // Если пустой массив
     if (msgMaxCount == 0)
     {
@@ -70,6 +78,11 @@ void IChatInterface::pagination()
         msgStart = 0;
         msgEnd = msgMaxCount;
         return;
+    }
+
+    if (msgPerPage < 1)
+    {
+        msgPerPage = 1;
     }
 
     // максимально возможный номер страницы, урезается если введен превышающий диапазон

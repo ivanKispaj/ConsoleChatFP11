@@ -16,5 +16,5 @@ public:
     Results registration();
     Results chat();
     void sendMessage();
-    void chatOptions();
+    void chatNavigation();
 };

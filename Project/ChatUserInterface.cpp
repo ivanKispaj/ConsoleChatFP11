@@ -146,14 +146,24 @@ Results ChatUserInterface::chat()
             sendMessage();
             break;
         case Results::chat_options:
-            chatOptions();
+            chatNavigation();
+            break;
+        case Results::back:
+            paginationMode = PaginationMode::last_page;
+            pageNumber = 1;
+            msgMaxCount = 0;
+            msgPerPage = 10;
+            maxPageNumber = 0;
+            msgStart = 0;
+            msgEnd = 0;
+            user = nullptr;
             break;
         default:
             break;
         }
         system(clear);
     } while (result != Results::back);
-    return empty;
+    return Results::empty;
 }
 
 void ChatUserInterface::sendMessage()
@@ -169,8 +179,31 @@ void ChatUserInterface::sendMessage()
     db->AddMessageToAllUsers(message);
 }
 
-void ChatUserInterface::chatOptions()
+void ChatUserInterface::chatNavigation()
 {
-    UserInput<int, int> startMessage(std::string(), "Укажите номер первого сообщения: ", "Неверный ввод.");
-    UserInput<int, int> perPage(std::string(), "Укажите количество сообщений: ", "Неверный ввод.");
+    UserInput<std::string, PaginationMode> selectOption(std::string(), "Выберите опцию (снс - сообщений на странице; пнс - перейти на страницу...; пкс - перейти к сообщению №...; н - вернуться в чат)", "Неверный ввод.", 4);
+    selectOption.addInputs("снс", "пнс", "пкс", "н");
+    selectOption.addOutputs(PaginationMode::msg_per_page, PaginationMode::page, PaginationMode::message, paginationMode);
+
+    UserInput<int, int> getInt(std::string(), std::string(), "Неверный ввод");
+
+    switch (selectOption.IOgetline())
+    {
+    case PaginationMode::msg_per_page:
+        getInt.setMainMessage("Укажите количество сообщений на странице (1 - " + std::to_string(msgMaxCount) + "): ");
+        msgPerPage = getInt.IOcinThrough();
+        break;
+    case PaginationMode::page:
+        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(maxPageNumber) + "): ");
+        pageNumber = getInt.IOcinThrough();
+        paginationMode = PaginationMode::page;
+        break;
+    case PaginationMode::message:
+        getInt.setMainMessage("Укажите номер сообщения (1 - " + std::to_string(msgMaxCount) + "): ");
+        msgStart = getInt.IOcinThrough() - 1;
+        paginationMode = PaginationMode::message;
+        break;
+    default:
+        break;
+    }
 }
