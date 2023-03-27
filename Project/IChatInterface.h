@@ -33,10 +33,28 @@ enum Results
     chat_options,
 };
 
+enum PaginationMode
+{
+    page,
+    last_page,
+    message,
+    msg_per_page,
+    close_options,
+};
+
 class IChatInterface
 {
 protected:
     std::unique_ptr<User> user = nullptr;
+
+    // настройки пагинации
+    PaginationMode paginationMode = PaginationMode::last_page;
+    int pageNumber = 1;
+    int msgMaxCount = 0;
+    int msgPerPage = 10;
+    int maxPageNumber = 0;
+    int msgStart = 0;
+    int msgEnd = 0;
 
 public:
     std::unique_ptr<DB> db;
@@ -48,11 +66,11 @@ public:
     /// @return
     Results login();
 
-    /// @brief Пагинатор. Высчитывает начальный и конечный индексы диапазона элементов в массиве
-    /// @param maxMsgs Максимальное количество элементов
-    /// @param msgPerPage Количество элементов в странице
-    /// @param pageNumber Номер страницы
-    /// @param start Для сохранения первого элемента страницы
-    /// @param end Для сохранения второго элемента страницы
-    void pagination(int maxMsgs, int msgPerPage, int pageNumber, int *start, int *end, int *maxPageNumber);
+    /// @brief Пагинатор. Высчитывает начальный и конечный индексы диапазона в массиве сообщений.
+    void pagination();
+
+    /// @brief Преобразует timestamp в дату/время
+    /// @param timestamp
+    /// @return
+    std::string StampToTime(long long timestamp);
 };

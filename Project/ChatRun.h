@@ -4,7 +4,7 @@
 #include "ChatUserInterface.h"
 #include "ChatAdminInterface.h"
 #include "UserInput.h"
-#define test(a) ;
+// #define test(a) ;
 
 class ChatRun
 {
@@ -21,7 +21,7 @@ ChatRun::ChatRun()
 
     ChatUserInterface userInterface;
     ChatAdminInterface adminInterface;
-    
+
 // тестовые сообщения и пользователи
 #ifdef test
     db->addUser("Максим", "mmn", "pass");      // 2
@@ -40,6 +40,9 @@ ChatRun::ChatRun()
 
     msg.setMessage("Как у нас дела? 🔥 ;-))))))");
     msg.setAuthorID(4);
+    db->AddMessageToAllUsers(msg);
+
+    msg.setMessage("Как у нас дела? 🔴 ;-))))))");
     db->AddMessageToAllUsers(msg);
 #endif
 
