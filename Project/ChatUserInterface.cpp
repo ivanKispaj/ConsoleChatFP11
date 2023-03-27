@@ -60,7 +60,7 @@ Results ChatUserInterface::registration()
     regEnd.addInputs("з", "о");
     regEnd.addOutputs(Results::register_success, Results::register_cancel);
 
-    // логин
+    // ввод логина
     bool validLogin = false;
     do
     {
@@ -73,18 +73,25 @@ Results ChatUserInterface::registration()
         }
     } while (!validLogin);
 
+    // ввод пароля
     password = getPass.IOgetlineThrough(true);
+
+    // ввод имени
     name = getName.IOgetlineThrough(true);
 
+    // завершение регистрации
     Results endInput;
-
     endInput = regEnd.IOgetline();
     if (endInput == Results::register_cancel)
     {
         return Results::register_cancel;
     }
-    User user(name, login, password);
-    db->addUser(user);
+
+    // При удачном завершении регистрации - переход в чат
+    User _user(name, login, password);
+    db->addUser(_user);
+    user = std::make_unique<User>(_user);
+    chat();
     return register_success;
 }
 
@@ -98,10 +105,10 @@ Results ChatUserInterface::chat()
     std::string chatDescription;
     std::string mainMessage;
 
-    mainMessage = "Выберите действие:\n"
-                  "с - написать сообщение;\n"
-                  "н - настройки;\n"
-                  "в - выход;\n";
+    mainMessage = "Выберите действие: "
+                  "(с - написать сообщение; "
+                  "н - настройки; "
+                  "в - выход): ";
 
     UserInput<std::string, Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 3);
     chatMainPage.addInputs("с", "н", "в");
@@ -112,29 +119,35 @@ Results ChatUserInterface::chat()
     do
     {
         auto messages = db->getAllPublicMessages(msgMaxCount);
+
+        pagination();
+
         if (messages == nullptr)
         {
             std::cout << "В этом чате нет сообщений. Начните общение первым." << std::endl;
         }
-        pagination();
 
         for (int i{msgStart}; i < msgEnd && messages != nullptr; i++)
         {
             auto msgUser = db->getUserById(messages[i].getAuthorID());
 
             std::cout << std::endl;
+            char time[128];
+            time_t tick = (time_t)(messages[i].getDate()); // conversion time
             std::cout
-                << "[" << messages[i].getId() << "] "
+                << i + 1 << ". "
+                << StampToTime(messages[i].getDate()) + " "
                 << msgUser->getUserName()
-                << "[" << msgUser->getUserLogin() << "]"
-                << "\t[" << std::to_string(msgUser->getId()) << "]"
+                << "[" << msgUser->getUserLogin() << "] "
+                << "\t[messageID " << messages[i].getId() << "] "
+                << "[userID " << std::to_string(msgUser->getId()) << "]"
                 << std::endl;
             std::cout << messages[i].getMessage() << std::endl;
         }
         std::cout << std::endl;
         chatDescription = user->getUserName() + " [" + user->getUserLogin() +
                           "] Общий чат. Показаны сообщения: " +
-                          std::to_string(msgStart + 1) + " - " +
+                          std::to_string((messages == nullptr) ? msgStart : msgStart + 1) + " - " +
                           std::to_string(msgEnd) + " из " +
                           std::to_string(msgMaxCount);
         chatMainPage.setDescription(chatDescription);
@@ -181,9 +194,17 @@ void ChatUserInterface::sendMessage()
 
 void ChatUserInterface::chatNavigation()
 {
-    UserInput<std::string, PaginationMode> selectOption(std::string(), "Выберите опцию (снс - сообщений на странице; пнс - перейти на страницу...; пкс - перейти к сообщению №...; н - вернуться в чат)", "Неверный ввод.", 4);
-    selectOption.addInputs("снс", "пнс", "пкс", "н");
-    selectOption.addOutputs(PaginationMode::msg_per_page, PaginationMode::page, PaginationMode::message, paginationMode);
+    UserInput<std::string, PaginationMode> selectOption(std::string(),
+                                                        "Выберите опцию:"
+                                                        "\nснс - сообщений на странице;"
+                                                        "\nпнс - перейти на страницу...;"
+                                                        "\nпкс - перейти к сообщению №...;"
+                                                        "\nсбр - сброс настроек (всегда последние 10 сообщений);"
+                                                        "\nн - вернуться в чат;"
+                                                        "\nВведите значение: ",
+                                                        "Неверный ввод.", 5);
+    selectOption.addInputs("снс", "пнс", "пкс", "сбр", "н");
+    selectOption.addOutputs(PaginationMode::msg_per_page, PaginationMode::page, PaginationMode::message, PaginationMode::last_page, PaginationMode::close_options);
 
     UserInput<int, int> getInt(std::string(), std::string(), "Неверный ввод");
 
@@ -194,7 +215,7 @@ void ChatUserInterface::chatNavigation()
         msgPerPage = getInt.IOcinThrough();
         break;
     case PaginationMode::page:
-        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(maxPageNumber) + "): ");
+        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(maxPageNumber - 1) + "): ");
         pageNumber = getInt.IOcinThrough();
         paginationMode = PaginationMode::page;
         break;
@@ -203,6 +224,9 @@ void ChatUserInterface::chatNavigation()
         msgStart = getInt.IOcinThrough() - 1;
         paginationMode = PaginationMode::message;
         break;
+    case PaginationMode::last_page:
+        msgMaxCount = 10;
+        paginationMode = PaginationMode::last_page;
     default:
         break;
     }

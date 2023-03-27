@@ -33,11 +33,13 @@ enum Results
     chat_options,
 };
 
-enum PaginationMode{
+enum PaginationMode
+{
     page,
     last_page,
     message,
     msg_per_page,
+    close_options,
 };
 
 class IChatInterface
@@ -47,7 +49,7 @@ protected:
 
     // настройки пагинации
     PaginationMode paginationMode = PaginationMode::last_page;
-    int pageNumber = 1;    
+    int pageNumber = 1;
     int msgMaxCount = 0;
     int msgPerPage = 10;
     int maxPageNumber = 0;
@@ -66,4 +68,9 @@ public:
 
     /// @brief Пагинатор. Высчитывает начальный и конечный индексы диапазона в массиве сообщений.
     void pagination();
+
+    /// @brief Преобразует timestamp в дату/время
+    /// @param timestamp
+    /// @return
+    std::string StampToTime(long long timestamp);
 };

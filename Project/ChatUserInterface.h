@@ -1,6 +1,7 @@
 #pragma once
 #include "IChatInterface.h"
 #include <iostream>
+#include <iomanip>
 class ChatUserInterface final : public IChatInterface
 {
 private:

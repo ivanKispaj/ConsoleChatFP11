@@ -113,3 +113,14 @@ void IChatInterface::pagination()
         msgEnd = msgMaxCount;
     }
 }
+
+std::string IChatInterface::StampToTime(long long timestamp)
+{
+    time_t tick = (time_t)(timestamp);
+	struct tm tm;
+	char s[40];
+	tm = *localtime(&tick);
+	strftime(s, sizeof(s), "%d.%m.%Y %H:%M:%S", &tm);
+	std::string str(s);
+	return str;
+}
