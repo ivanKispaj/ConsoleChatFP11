@@ -10,12 +10,12 @@ public:
     ~ChatUserInterface() = default;
 
     /// @brief Первоначальный запуск чата
-    /// @return Results
-    Results run(std::unique_ptr<DB> _db) override;
-    Results loginInChat();
-    Results registration();
-    Results publicChat();
+    /// @return chat::Results
+    chat::Results run(std::unique_ptr<DB> _db) override;
+    chat::Results loginInChat();
+    chat::Results registration();
+    chat::Results publicChat();
     void sendMessage();
     
-    Results privateChat();
+    chat::Results privateChat();
 };

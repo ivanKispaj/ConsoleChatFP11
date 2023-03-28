@@ -1,60 +1,60 @@
 #include "ChatUserInterface.h"
 
-Results ChatUserInterface::run(std::unique_ptr<DB> _db)
+chat::Results ChatUserInterface::run(std::unique_ptr<DB> _db)
 {
     db = std::move(_db);
-    Results userInput = Results::empty;
-    Results result = Results::empty;
-    UserInput<std::string, Results> chatAreaPage("Страница авторизации и регистрации",
+    chat::Results userInput = chat::empty;
+    chat::Results result = chat::empty;
+    UserInput<std::string, chat::Results> chatAreaPage("Страница авторизации и регистрации",
                                                  "Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
                                                  "Неверный ввод", 4);
     chatAreaPage.addInputs("р", "вх", "н", "вых");
-    chatAreaPage.addOutputs(Results::registration, Results::login, Results::back, Results::app_exit);
+    chatAreaPage.addOutputs(chat::registration, chat::login, chat::back, chat::app_exit);
     do
     {
         system(clear);
         userInput = chatAreaPage.IOgetline();
         switch (userInput)
         {
-        case Results::registration:
+        case chat::registration:
             result = registration();
             break;
-        case Results::login:
+        case chat::login:
             result = loginInChat();
             break;
-        case Results::back:
-            result = Results::back;
+        case chat::back:
+            result = chat::back;
             user = nullptr;
             break;
-        case Results::private_chat:
+        case chat::private_chat:
             result = privateChat();
             break;
-        case Results::public_chat:
+        case chat::public_chat:
             result = publicChat();
             break;
-        case Results::app_exit:
-            result = Results::app_exit;
+        case chat::app_exit:
+            result = chat::app_exit;
             user = nullptr;
             break;
         default:
             break;
         }
         defaultOptions();
-    } while (result != Results::app_exit && result != Results::back);
+    } while (result != chat::app_exit && result != chat::back);
     return result;
 }
 
-Results ChatUserInterface::loginInChat()
+chat::Results ChatUserInterface::loginInChat()
 {
     auto result = login();
-    if (result == Results::login_success)
+    if (result == chat::login_success)
     {
         return publicChat();
     }
     return result;
 }
 
-Results ChatUserInterface::registration()
+chat::Results ChatUserInterface::registration()
 {
     std::string login;
     std::string name;
@@ -65,9 +65,9 @@ Results ChatUserInterface::registration()
     UserInput<std::string, std::string> getLogin("Страница регистрации", "Введите логин: ", incorrectInput);
     UserInput<std::string, std::string> getName(std::string(), "Введите отображаемое имя пользователя: ", incorrectInput);
     UserInput<std::string, std::string> getPass(std::string(), "Введите пароль: ", incorrectInput);
-    UserInput<std::string, Results> regEnd(std::string(), "Выберите действие (з - Зарегистрироваться, о - Отменить регистрацию): ", "Неверный ввод", 2);
+    UserInput<std::string, chat::Results> regEnd(std::string(), "Выберите действие (з - Зарегистрироваться, о - Отменить регистрацию): ", "Неверный ввод", 2);
     regEnd.addInputs("з", "о");
-    regEnd.addOutputs(Results::register_success, Results::register_cancel);
+    regEnd.addOutputs(chat::register_success, chat::register_cancel);
 
     // ввод логина
     bool validLogin = false;
@@ -89,11 +89,11 @@ Results ChatUserInterface::registration()
     name = getName.IOgetlineThrough(true);
 
     // завершение регистрации
-    Results endInput;
+    chat::Results endInput;
     endInput = regEnd.IOgetline();
-    if (endInput == Results::register_cancel)
+    if (endInput == chat::register_cancel)
     {
-        return Results::register_cancel;
+        return chat::register_cancel;
     }
 
     // При удачном завершении регистрации - переход в чат
@@ -103,7 +103,7 @@ Results ChatUserInterface::registration()
     return publicChat();
 }
 
-Results ChatUserInterface::publicChat()
+chat::Results ChatUserInterface::publicChat()
 {
     std::cout << std::endl;
     std::cout << "Здравствуйте, " << user->getUserName() << "!" << std::endl;
@@ -118,15 +118,15 @@ Results ChatUserInterface::publicChat()
                   "л - личные сообщения; "
                   "в - выход): ";
 
-    UserInput<std::string, Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 4);
+    UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 4);
     chatMainPage.addInputs("с", "н", "л", "в");
-    chatMainPage.addOutputs(Results::send_message, Results::chat_options, Results::private_chat, Results::back);
+    chatMainPage.addOutputs(chat::send_message, chat::chat_options, chat::private_chat, chat::back);
 
-    Results result = Results::empty;
+    chat::Results result = chat::empty;
 
     do
     {
-        if(result == Results::private_chat){
+        if(result == chat::private_chat){
             return result;
         }
         auto messages = db->getAllPublicMessages(pg_msgMaxCount);
@@ -166,18 +166,18 @@ Results ChatUserInterface::publicChat()
         result = chatMainPage.IOgetline();
         switch (result)
         {
-        case Results::send_message:
+        case chat::send_message:
             sendMessage();
             break;
-        case Results::chat_options:
+        case chat::chat_options:
             chatNavigation();
             break;
         default:
             break;
         }
         system(clear);
-    } while (result != Results::back);
-    return Results::empty;
+    } while (result != chat::back);
+    return chat::empty;
 }
 
 void ChatUserInterface::sendMessage()
@@ -193,7 +193,7 @@ void ChatUserInterface::sendMessage()
     db->AddMessageToAllUsers(message);
 }
 
-Results ChatUserInterface::privateChat()
+chat::Results ChatUserInterface::privateChat()
 {
-    return Results();
+    return chat::Results();
 }

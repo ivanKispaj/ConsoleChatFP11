@@ -1,16 +1,16 @@
 #include "IChatInterface.h"
 
-Results IChatInterface::login()
+chat::Results IChatInterface::login()
 {
     std::string _login;
-    Results endInput = Results::empty;
+    chat::Results endInput = chat::empty;
     std::string incorrectInput = "Неверный ввод. Пустые значения недопустимы.";
 
     UserInput<std::string, std::string> getLogin("Страница входа", "Введите логин: ", incorrectInput);
     UserInput<std::string, std::string> getPass(std::string(), "Введите пароль: ", incorrectInput);
-    UserInput<std::string, Results> loginCancel(std::string(), "Отменить вход? (да - отменить, нет - продолжить): ", "Неверный ввод. Требуется: да или нет", 4);
+    UserInput<std::string, chat::Results> loginCancel(std::string(), "Отменить вход? (да - отменить, нет - продолжить): ", "Неверный ввод. Требуется: да или нет", 4);
     loginCancel.addInputs("да", "нет", "yes", "no");
-    loginCancel.addOutputs(Results::yes, Results::no, Results::yes, Results::no);
+    loginCancel.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
 
     // ввод логина
     do
@@ -27,9 +27,9 @@ Results IChatInterface::login()
         {
             std::cout << e.what() << std::endl;
             endInput = loginCancel.IOgetline();
-            if (endInput == Results::yes)
+            if (endInput == chat::yes)
             {
-                return login_cancel;
+                return chat::login_cancel;
             }
         }
     } while (1);
@@ -45,13 +45,13 @@ Results IChatInterface::login()
         {
             std::cout << "Неверный пароль: " << std::endl;
             endInput = loginCancel.IOgetline();
-            if (endInput == Results::yes)
+            if (endInput == chat::yes)
             {
-                return login_cancel;
+                return chat::login_cancel;
             }
         }
     } while (!validate);
-    return login_success;
+    return chat::login_success;
 }
 
 void IChatInterface::pagination()
@@ -93,21 +93,21 @@ void IChatInterface::pagination()
     }
 
     // если запрошена страница
-    if (paginationMode == PaginationMode::page)
+    if (paginationMode == page::page)
     {
         pg_msgStart = pg_msgPerPage * (pg_pageNumber - 1);
         pg_msgEnd = pg_msgStart + pg_msgPerPage;
     }
 
     // если запрошен показ страницы от конкретного сообщения
-    if (paginationMode == PaginationMode::message)
+    if (paginationMode == page::message)
     {
         pg_msgEnd = pg_msgStart + pg_msgPerPage;
     }
 
     // pg_msgStart + pg_msgPerPage превысил максимум или запрошена последняя страница
     // будут отображаться последние pg_msgPerPage сообщений
-    if ((pg_msgEnd > pg_msgMaxCount) || (paginationMode == PaginationMode::last_page))
+    if ((pg_msgEnd > pg_msgMaxCount) || (paginationMode == page::last_page))
     {
         pg_msgStart = pg_msgMaxCount - pg_msgPerPage;
         pg_msgEnd = pg_msgMaxCount;
@@ -127,7 +127,7 @@ std::string IChatInterface::StampToTime(long long timestamp)
 
 void IChatInterface::defaultOptions()
 {
-    paginationMode = PaginationMode::last_page;
+    paginationMode = page::last_page;
     pg_pageNumber = 1;
     pg_msgMaxCount = 0;
     pg_msgPerPage = 10;
@@ -138,7 +138,7 @@ void IChatInterface::defaultOptions()
 
 void IChatInterface::chatNavigation()
 {
-    UserInput<std::string, PaginationMode> selectOption(std::string(),
+    UserInput<std::string, page::PaginationMode> selectOption(std::string(),
                                                         "Выберите опцию:"
                                                         "\nснс - сообщений на странице;"
                                                         "\nпнс - перейти на страницу...;"
@@ -148,29 +148,29 @@ void IChatInterface::chatNavigation()
                                                         "\nВведите значение: ",
                                                         "Неверный ввод.", 5);
     selectOption.addInputs("снс", "пнс", "пкс", "сбр", "н");
-    selectOption.addOutputs(PaginationMode::msg_per_page, PaginationMode::page, PaginationMode::message, PaginationMode::last_page, PaginationMode::close_options);
+    selectOption.addOutputs(page::msg_per_page, page::page, page::message, page::last_page, page::close_options);
 
     UserInput<int, int> getInt(std::string(), std::string(), "Неверный ввод");
 
     switch (selectOption.IOgetline())
     {
-    case PaginationMode::msg_per_page:
+    case page::msg_per_page:
         getInt.setMainMessage("Укажите количество сообщений на странице (1 - " + std::to_string(pg_msgMaxCount) + "): ");
         pg_msgPerPage = getInt.IOcinThrough();
         break;
-    case PaginationMode::page:
+    case page::page:
         getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber - 1) + "): ");
         pg_pageNumber = getInt.IOcinThrough();
-        paginationMode = PaginationMode::page;
+        paginationMode = page::page;
         break;
-    case PaginationMode::message:
+    case page::message:
         getInt.setMainMessage("Укажите номер сообщения (1 - " + std::to_string(pg_msgMaxCount) + "): ");
         pg_msgStart = getInt.IOcinThrough() - 1;
-        paginationMode = PaginationMode::message;
+        paginationMode = page::message;
         break;
-    case PaginationMode::last_page:
+    case page::last_page:
         pg_msgMaxCount = 10;
-        paginationMode = PaginationMode::last_page;
+        paginationMode = page::last_page;
     default:
         break;
     }

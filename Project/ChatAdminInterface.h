@@ -7,5 +7,5 @@ private:
 public:
     ChatAdminInterface() = default;
     ~ChatAdminInterface() = default;
-    Results run(std::unique_ptr<DB> _db) override;
+    chat::Results run(std::unique_ptr<DB> _db) override;
 };
