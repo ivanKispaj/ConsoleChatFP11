@@ -1,9 +1,11 @@
 #pragma once
 #include "IChatInterface.h"
 #include <iostream>
+#include <iomanip>
 class ChatUserInterface final : public IChatInterface
 {
 private:
+    int msgPerPages = 10;
 public:
     ChatUserInterface() = default;
     ~ChatUserInterface() = default;
@@ -15,4 +17,5 @@ public:
     Results registration();
     Results chat();
     void sendMessage();
+    void chatNavigation();
 };
