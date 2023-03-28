@@ -1,11 +1,10 @@
 #pragma once
 #include "IChatInterface.h"
 #include <iostream>
-#include <iomanip>
+
 class ChatUserInterface final : public IChatInterface
 {
 private:
-    int msgPerPages = 10;
 public:
     ChatUserInterface() = default;
     ~ChatUserInterface() = default;
@@ -15,7 +14,8 @@ public:
     Results run(std::unique_ptr<DB> _db) override;
     Results loginInChat();
     Results registration();
-    Results chat();
+    Results publicChat();
     void sendMessage();
-    void chatNavigation();
+    
+    Results privateChat();
 };

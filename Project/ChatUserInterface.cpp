@@ -24,13 +24,22 @@ Results ChatUserInterface::run(std::unique_ptr<DB> _db)
             break;
         case Results::back:
             result = Results::back;
+            user = nullptr;
+            break;
+        case Results::private_chat:
+            result = privateChat();
+            break;
+        case Results::public_chat:
+            result = publicChat();
             break;
         case Results::app_exit:
             result = Results::app_exit;
+            user = nullptr;
             break;
         default:
             break;
         }
+        defaultOptions();
     } while (result != Results::app_exit && result != Results::back);
     return result;
 }
@@ -40,7 +49,7 @@ Results ChatUserInterface::loginInChat()
     auto result = login();
     if (result == Results::login_success)
     {
-        return chat();
+        return publicChat();
     }
     return result;
 }
@@ -91,13 +100,11 @@ Results ChatUserInterface::registration()
     User _user(name, login, password);
     db->addUser(_user);
     user = std::make_unique<User>(_user);
-    chat();
-    return register_success;
+    return publicChat();
 }
 
-Results ChatUserInterface::chat()
+Results ChatUserInterface::publicChat()
 {
-    // system(clear);
     std::cout << std::endl;
     std::cout << "Здравствуйте, " << user->getUserName() << "!" << std::endl;
     std::cout << "Вы успешно вошли в чат." << std::endl;
@@ -108,17 +115,21 @@ Results ChatUserInterface::chat()
     mainMessage = "Выберите действие: "
                   "(с - написать сообщение; "
                   "н - настройки; "
+                  "л - личные сообщения; "
                   "в - выход): ";
 
-    UserInput<std::string, Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 3);
-    chatMainPage.addInputs("с", "н", "в");
-    chatMainPage.addOutputs(Results::send_message, Results::chat_options, Results::back);
+    UserInput<std::string, Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 4);
+    chatMainPage.addInputs("с", "н", "л", "в");
+    chatMainPage.addOutputs(Results::send_message, Results::chat_options, Results::private_chat, Results::back);
 
-    Results result;
+    Results result = Results::empty;
 
     do
     {
-        auto messages = db->getAllPublicMessages(msgMaxCount);
+        if(result == Results::private_chat){
+            return result;
+        }
+        auto messages = db->getAllPublicMessages(pg_msgMaxCount);
 
         pagination();
 
@@ -127,7 +138,7 @@ Results ChatUserInterface::chat()
             std::cout << "В этом чате нет сообщений. Начните общение первым." << std::endl;
         }
 
-        for (int i{msgStart}; i < msgEnd && messages != nullptr; i++)
+        for (int i{pg_msgStart}; i < pg_msgEnd && messages != nullptr; i++)
         {
             auto msgUser = db->getUserById(messages[i].getAuthorID());
 
@@ -147,9 +158,9 @@ Results ChatUserInterface::chat()
         std::cout << std::endl;
         chatDescription = user->getUserName() + " [" + user->getUserLogin() +
                           "] Общий чат. Показаны сообщения: " +
-                          std::to_string((messages == nullptr) ? msgStart : msgStart + 1) + " - " +
-                          std::to_string(msgEnd) + " из " +
-                          std::to_string(msgMaxCount);
+                          std::to_string((messages == nullptr) ? pg_msgStart : pg_msgStart + 1) + " - " +
+                          std::to_string(pg_msgEnd) + " из " +
+                          std::to_string(pg_msgMaxCount);
         chatMainPage.setDescription(chatDescription);
 
         result = chatMainPage.IOgetline();
@@ -160,16 +171,6 @@ Results ChatUserInterface::chat()
             break;
         case Results::chat_options:
             chatNavigation();
-            break;
-        case Results::back:
-            paginationMode = PaginationMode::last_page;
-            pageNumber = 1;
-            msgMaxCount = 0;
-            msgPerPage = 10;
-            maxPageNumber = 0;
-            msgStart = 0;
-            msgEnd = 0;
-            user = nullptr;
             break;
         default:
             break;
@@ -192,42 +193,7 @@ void ChatUserInterface::sendMessage()
     db->AddMessageToAllUsers(message);
 }
 
-void ChatUserInterface::chatNavigation()
+Results ChatUserInterface::privateChat()
 {
-    UserInput<std::string, PaginationMode> selectOption(std::string(),
-                                                        "Выберите опцию:"
-                                                        "\nснс - сообщений на странице;"
-                                                        "\nпнс - перейти на страницу...;"
-                                                        "\nпкс - перейти к сообщению №...;"
-                                                        "\nсбр - сброс настроек (всегда последние 10 сообщений);"
-                                                        "\nн - вернуться в чат;"
-                                                        "\nВведите значение: ",
-                                                        "Неверный ввод.", 5);
-    selectOption.addInputs("снс", "пнс", "пкс", "сбр", "н");
-    selectOption.addOutputs(PaginationMode::msg_per_page, PaginationMode::page, PaginationMode::message, PaginationMode::last_page, PaginationMode::close_options);
-
-    UserInput<int, int> getInt(std::string(), std::string(), "Неверный ввод");
-
-    switch (selectOption.IOgetline())
-    {
-    case PaginationMode::msg_per_page:
-        getInt.setMainMessage("Укажите количество сообщений на странице (1 - " + std::to_string(msgMaxCount) + "): ");
-        msgPerPage = getInt.IOcinThrough();
-        break;
-    case PaginationMode::page:
-        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(maxPageNumber - 1) + "): ");
-        pageNumber = getInt.IOcinThrough();
-        paginationMode = PaginationMode::page;
-        break;
-    case PaginationMode::message:
-        getInt.setMainMessage("Укажите номер сообщения (1 - " + std::to_string(msgMaxCount) + "): ");
-        msgStart = getInt.IOcinThrough() - 1;
-        paginationMode = PaginationMode::message;
-        break;
-    case PaginationMode::last_page:
-        msgMaxCount = 10;
-        paginationMode = PaginationMode::last_page;
-    default:
-        break;
-    }
+    return Results();
 }

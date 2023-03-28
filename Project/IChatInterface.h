@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include "UserInput.h"
+
 const extern char clear[];
 
 /**
@@ -31,6 +32,8 @@ enum Results
     login,
     send_message,
     chat_options,
+    private_chat,
+    public_chat,
 };
 
 enum PaginationMode
@@ -49,12 +52,12 @@ protected:
 
     // настройки пагинации
     PaginationMode paginationMode = PaginationMode::last_page;
-    int pageNumber = 1;
-    int msgMaxCount = 0;
-    int msgPerPage = 10;
-    int maxPageNumber = 0;
-    int msgStart = 0;
-    int msgEnd = 0;
+    int pg_pageNumber = 1;
+    int pg_msgMaxCount = 0;
+    int pg_msgPerPage = 10;
+    int pg_maxPageNumber = 0;
+    int pg_msgStart = 0;
+    int pg_msgEnd = 0;
 
 public:
     std::unique_ptr<DB> db;
@@ -73,4 +76,8 @@ public:
     /// @param timestamp
     /// @return
     std::string StampToTime(long long timestamp);
+
+    void defaultOptions();
+
+    void chatNavigation();
 };
