@@ -56,37 +56,37 @@ chat::Results IChatInterface::login()
 
 void IChatInterface::pagination()
 {
-    if (pg_msgStart < 0)
+    if (pg_StartItem < 0)
     {
-        pg_msgStart = 0;
+        pg_StartItem = 0;
     }
     if (pg_pageNumber < 1)
     {
         pg_pageNumber = 1;
     }
     // Если пустой массив
-    if (pg_msgMaxCount == 0)
+    if (pg_MaxItems == 0)
     {
-        pg_msgStart = 0;
-        pg_msgEnd = 0;
+        pg_StartItem = 0;
+        pg_EndItem = 0;
         return;
     }
 
     // количество сообщений на страницу не должно превышать максимального количества сообщений
-    if (pg_msgPerPage >= pg_msgMaxCount)
+    if (pg_itemsPerPage >= pg_MaxItems)
     {
-        pg_msgStart = 0;
-        pg_msgEnd = pg_msgMaxCount;
+        pg_StartItem = 0;
+        pg_EndItem = pg_MaxItems;
         return;
     }
 
-    if (pg_msgPerPage < 1)
+    if (pg_itemsPerPage < 1)
     {
-        pg_msgPerPage = 1;
+        pg_itemsPerPage = 1;
     }
 
     // максимально возможный номер страницы, урезается если введен превышающий диапазон
-    pg_maxPageNumber = (pg_msgMaxCount / pg_msgPerPage) + 1;
+    pg_maxPageNumber = (pg_MaxItems / pg_itemsPerPage) + 1;
     if (pg_pageNumber > pg_maxPageNumber)
     {
         pg_pageNumber = pg_maxPageNumber;
@@ -95,22 +95,22 @@ void IChatInterface::pagination()
     // если запрошена страница
     if (paginationMode == page::page)
     {
-        pg_msgStart = pg_msgPerPage * (pg_pageNumber - 1);
-        pg_msgEnd = pg_msgStart + pg_msgPerPage;
+        pg_StartItem = pg_itemsPerPage * (pg_pageNumber - 1);
+        pg_EndItem = pg_StartItem + pg_itemsPerPage;
     }
 
     // если запрошен показ страницы от конкретного сообщения
     if (paginationMode == page::message)
     {
-        pg_msgEnd = pg_msgStart + pg_msgPerPage;
+        pg_EndItem = pg_StartItem + pg_itemsPerPage;
     }
 
-    // pg_msgStart + pg_msgPerPage превысил максимум или запрошена последняя страница
-    // будут отображаться последние pg_msgPerPage сообщений
-    if ((pg_msgEnd > pg_msgMaxCount) || (paginationMode == page::last_page))
+    // pg_StartItem + pg_itemsPerPage превысил максимум или запрошена последняя страница
+    // будут отображаться последние pg_itemsPerPage сообщений
+    if ((pg_EndItem > pg_MaxItems) || (paginationMode == page::last_page))
     {
-        pg_msgStart = pg_msgMaxCount - pg_msgPerPage;
-        pg_msgEnd = pg_msgMaxCount;
+        pg_StartItem = pg_MaxItems - pg_itemsPerPage;
+        pg_EndItem = pg_MaxItems;
     }
 }
 
@@ -125,29 +125,29 @@ std::string IChatInterface::StampToTime(long long timestamp)
     return str;
 }
 
-void IChatInterface::defaultOptions()
+void IChatInterface::pg_Default()
 {
     paginationMode = page::last_page;
     pg_pageNumber = 1;
-    pg_msgMaxCount = 0;
-    pg_msgPerPage = 10;
+    pg_MaxItems = 0;
+    pg_itemsPerPage = 10;
     pg_maxPageNumber = 0;
-    pg_msgStart = 0;
-    pg_msgEnd = 0;
+    pg_StartItem = 0;
+    pg_EndItem = 0;
 }
 
 void IChatInterface::chatNavigation()
 {
     UserInput<std::string, page::PaginationMode> selectOption(std::string(),
                                                         "Выберите опцию:"
-                                                        "\nснс - сообщений на странице;"
+                                                        "\nэнс - элементов на странице;"
                                                         "\nпнс - перейти на страницу...;"
-                                                        "\nпкс - перейти к сообщению №...;"
-                                                        "\nсбр - сброс настроек (всегда последние 10 сообщений);"
+                                                        "\nпкэ - перейти к элементу №...;"
+                                                        "\nсбр - сброс настроек (всегда последние 10 элементов);"
                                                         "\nн - вернуться в чат;"
                                                         "\nВведите значение: ",
                                                         "Неверный ввод.", 5);
-    selectOption.addInputs("снс", "пнс", "пкс", "сбр", "н");
+    selectOption.addInputs("энс", "пнс", "пкэ", "сбр", "н");
     selectOption.addOutputs(page::msg_per_page, page::page, page::message, page::last_page, page::close_options);
 
     UserInput<int, int> getInt(std::string(), std::string(), "Неверный ввод");
@@ -155,8 +155,8 @@ void IChatInterface::chatNavigation()
     switch (selectOption.IOgetline())
     {
     case page::msg_per_page:
-        getInt.setMainMessage("Укажите количество сообщений на странице (1 - " + std::to_string(pg_msgMaxCount) + "): ");
-        pg_msgPerPage = getInt.IOcinThrough();
+        getInt.setMainMessage("Укажите количество элементов на странице (1 - " + std::to_string(pg_MaxItems) + "): ");
+        pg_itemsPerPage = getInt.IOcinThrough();
         break;
     case page::page:
         getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber - 1) + "): ");
@@ -164,12 +164,12 @@ void IChatInterface::chatNavigation()
         paginationMode = page::page;
         break;
     case page::message:
-        getInt.setMainMessage("Укажите номер сообщения (1 - " + std::to_string(pg_msgMaxCount) + "): ");
-        pg_msgStart = getInt.IOcinThrough() - 1;
+        getInt.setMainMessage("Укажите номер элемента (1 - " + std::to_string(pg_MaxItems) + "): ");
+        pg_StartItem = getInt.IOcinThrough() - 1;
         paginationMode = page::message;
         break;
     case page::last_page:
-        pg_msgMaxCount = 10;
+        pg_MaxItems = 10;
         paginationMode = page::last_page;
     default:
         break;
