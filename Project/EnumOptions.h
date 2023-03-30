@@ -19,6 +19,11 @@ namespace chat
         chat_options,
         private_chat,
         public_chat,
+        search_user_byId,
+        search_user_byName,
+        search_user_byLogin,
+        user_list,
+        user_not_found,
     };
 };
 
@@ -32,4 +37,4 @@ namespace page
         msg_per_page,
         close_options,
     };
-}
+};
