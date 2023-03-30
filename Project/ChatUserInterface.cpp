@@ -4,10 +4,9 @@ chat::Results ChatUserInterface::run(std::unique_ptr<DB> _db)
 {
     db = std::move(_db);
     chat::Results userInput = chat::empty;
-    chat::Results result = chat::empty;
     UserInput<std::string, chat::Results> chatAreaPage("Страница авторизации и регистрации",
-                                                 "Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
-                                                 "Неверный ввод", 4);
+                                                       "Выберите действие (р - Регистрация, вх - Вход, н - Назад, вых - выход): ",
+                                                       "Неверный ввод", 4);
     chatAreaPage.addInputs("р", "вх", "н", "вых");
     chatAreaPage.addOutputs(chat::registration, chat::login, chat::back, chat::app_exit);
     do
@@ -17,31 +16,25 @@ chat::Results ChatUserInterface::run(std::unique_ptr<DB> _db)
         switch (userInput)
         {
         case chat::registration:
-            result = registration();
+            userInput = registration();
             break;
         case chat::login:
-            result = loginInChat();
+            userInput = loginInChat();
             break;
         case chat::back:
-            result = chat::back;
+            userInput = chat::back;
             user = nullptr;
             break;
-        case chat::private_chat:
-            result = privateChat();
-            break;
-        case chat::public_chat:
-            result = publicChat();
-            break;
         case chat::app_exit:
-            result = chat::app_exit;
+            userInput = chat::app_exit;
             user = nullptr;
             break;
         default:
             break;
         }
-        defaultOptions();
-    } while (result != chat::app_exit && result != chat::back);
-    return result;
+        pg_Default();
+    } while (userInput != chat::app_exit && userInput != chat::back);
+    return userInput;
 }
 
 chat::Results ChatUserInterface::loginInChat()
@@ -126,10 +119,7 @@ chat::Results ChatUserInterface::publicChat()
 
     do
     {
-        if(result == chat::private_chat){
-            return result;
-        }
-        auto messages = db->getAllPublicMessages(pg_msgMaxCount);
+        auto messages = db->getAllPublicMessages(pg_MaxItems);
 
         pagination();
 
@@ -138,13 +128,11 @@ chat::Results ChatUserInterface::publicChat()
             std::cout << "В этом чате нет сообщений. Начните общение первым." << std::endl;
         }
 
-        for (int i{pg_msgStart}; i < pg_msgEnd && messages != nullptr; i++)
+        for (int i{pg_StartItem}; i < pg_EndItem && messages != nullptr; i++)
         {
             auto msgUser = db->getUserById(messages[i].getAuthorID());
 
             std::cout << std::endl;
-            char time[128];
-            time_t tick = (time_t)(messages[i].getDate()); // conversion time
             std::cout
                 << i + 1 << ". "
                 << StampToTime(messages[i].getDate()) + " "
@@ -158,9 +146,9 @@ chat::Results ChatUserInterface::publicChat()
         std::cout << std::endl;
         chatDescription = user->getUserName() + " [" + user->getUserLogin() +
                           "] Общий чат. Показаны сообщения: " +
-                          std::to_string((messages == nullptr) ? pg_msgStart : pg_msgStart + 1) + " - " +
-                          std::to_string(pg_msgEnd) + " из " +
-                          std::to_string(pg_msgMaxCount);
+                          std::to_string((messages == nullptr) ? pg_StartItem : pg_StartItem + 1) + " - " +
+                          std::to_string(pg_EndItem) + " из " +
+                          std::to_string(pg_MaxItems);
         chatMainPage.setDescription(chatDescription);
 
         result = chatMainPage.IOgetline();
@@ -171,6 +159,9 @@ chat::Results ChatUserInterface::publicChat()
             break;
         case chat::chat_options:
             chatNavigation();
+            break;
+        case chat::private_chat:
+            result = privateChat();
             break;
         default:
             break;
@@ -195,5 +186,105 @@ void ChatUserInterface::sendMessage()
 
 chat::Results ChatUserInterface::privateChat()
 {
+    system(clear);
+
+    UserInput<std::string, chat::Results> privateMainPage("Личные сообщения. Главная страница.",
+                                                          "Выбор пользователя:\n"
+                                                          "\tл - по логину;\n"
+                                                          "\tи - по userID;\n"
+                                                          "Другие опции:\n"
+                                                          "\tн - навигация по списку пользователей;"
+                                                          "\tо - вернуться в общий чат;"
+                                                          "\tв - выйти из чата"
+                                                          "Укажите опцию: ",
+                                                          "Неверный ввод", 5);
+    privateMainPage.addInputs("л", "и", "н", "о", "в");
+    privateMainPage.addOutputs(chat::search_user_byLogin,
+                               chat::search_user_byId,
+                               chat::user_list,
+                               chat::public_chat,
+                               chat::back);
+    chat::Results result = chat::public_chat;
+    std::string chatDescription;
+    do
+    {
+        auto users = db->getAllUsers();
+        pg_MaxItems = db->usersCount();
+        pagination();
+
+        if (users == nullptr)
+        {
+            std::cout << "В этом чате нет пользователей. Пригласите других участников." << std::endl;
+        }
+        for (int i{pg_StartItem}; i < pg_EndItem && users != nullptr; i++)
+        {
+            std::cout
+                << i + 1 << ". "
+
+                << users[i].getUserName()
+                << "[" << users[i].getUserLogin() << "] "
+                << "\t[userID " << std::to_string(users[i].getId()) << "]"
+                << std::endl;
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+        chatDescription = user->getUserName() + " [" + user->getUserLogin() +
+                          "] Личные сообщения. Главная страница. Показаны пользователи: " +
+                          std::to_string((users == nullptr) ? pg_StartItem : pg_StartItem + 1) + " - " +
+                          std::to_string(pg_EndItem) + " из " +
+                          std::to_string(pg_MaxItems);
+
+        privateMainPage.setDescription(chatDescription);
+        result = privateMainPage.IOgetline();
+
+        switch (result)
+        {
+        case chat::search_user_byLogin:
+            result = privateChatWithUser(chat::search_user_byLogin);
+            break;
+        case chat::search_user_byId:
+            result = privateChatWithUser(chat::search_user_byId);
+            break;
+        default:
+            break;
+        }
+    } while (1);
+
+    return result;
+}
+
+void ChatUserInterface::searchUser(chat::Results results)
+{
+    UserInput<int, int> searchByIdInput("Писк пользователя по userID", "Введите userID: ", "Неверный ввод");
+    UserInput<std::string, std::string> searchByNameInput("Писк пользователя по логину", "Введите логин пользователя: ", "Неверный ввод");
+    if (results = chat::search_user_byId)
+    {
+        int uid = searchByIdInput.IOcinThrough();
+        std::unique_ptr<User> _user = db->getUserById(uid);
+        pm_user = std::move(_user);
+        if (pm_user == nullptr)
+        {
+            std::cout << "Пользователь с userId = " + std::to_string(uid) + " не существует." << std::endl;
+        }
+    }
+    if (results == chat::search_user_byLogin)
+    {
+        std::string login = searchByIdInput.IOgetlineThrough();
+        std::unique_ptr<User> _user = db->getUserByLogin(login);
+        pm_user = std::move(_user);
+        if (pm_user == nullptr)
+        {
+            std::cout << "Пользователь с логином = " + login + " не существует." << std::endl;
+        }
+    }
+}
+
+chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
+{
+    searchUser(result);
+    if (pm_user == nullptr)
+    {
+        return chat::user_not_found;
+    }
     return chat::Results();
 }
