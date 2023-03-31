@@ -114,17 +114,6 @@ void IChatInterface::pagination()
     }
 }
 
-std::string IChatInterface::StampToTime(long long timestamp)
-{
-    time_t tick = (time_t)(timestamp);
-    struct tm tm;
-    char s[40];
-    tm = *localtime(&tick);
-    strftime(s, sizeof(s), "%d.%m.%Y %H:%M:%S", &tm);
-    std::string str(s);
-    return str;
-}
-
 void IChatInterface::pgDefault()
 {
     paginationMode = page::last_page;
@@ -139,14 +128,14 @@ void IChatInterface::pgDefault()
 void IChatInterface::pgNavigation()
 {
     UserInput<std::string, page::PaginationMode> selectOption(std::string(),
-                                                        "Выберите опцию:"
-                                                        "\nэнс - элементов на странице;"
-                                                        "\nпнс - перейти на страницу...;"
-                                                        "\nпкэ - перейти к элементу №...;"
-                                                        "\nсбр - сброс настроек (всегда последние 10 элементов);"
-                                                        "\nн - вернуться в чат;"
-                                                        "\nВведите значение: ",
-                                                        "Неверный ввод.", 5);
+                                                              "Выберите опцию:"
+                                                              "\nэнс - элементов на странице;"
+                                                              "\nпнс - перейти на страницу...;"
+                                                              "\nпкэ - перейти к элементу №...;"
+                                                              "\nсбр - сброс настроек (всегда последние 10 элементов);"
+                                                              "\nн - вернуться в чат;"
+                                                              "\nВведите значение: ",
+                                                              "Неверный ввод.", 5);
     selectOption.addInputs("энс", "пнс", "пкэ", "сбр", "н");
     selectOption.addOutputs(page::msg_per_page, page::page, page::message, page::last_page, page::close_options);
 
@@ -174,4 +163,58 @@ void IChatInterface::pgNavigation()
     default:
         break;
     }
+}
+
+std::string IChatInterface::StampToTime(long long timestamp)
+{
+    time_t tick = (time_t)(timestamp);
+    struct tm tm;
+    char s[40];
+    tm = *localtime(&tick);
+    strftime(s, sizeof(s), "%d.%m.%Y %H:%M:%S", &tm);
+    std::string str(s);
+    return str;
+}
+
+void IChatInterface::messagesList(std::unique_ptr<Message[]> messages)
+{
+    pagination();
+    for (int i{pg_StartItem}; i < pg_EndItem && messages != nullptr; i++)
+    {
+        auto msgUser = db->getUserById(messages[i].getAuthorID());
+
+        std::cout << std::endl;
+        std::cout
+            << i + 1 << ". "
+            << StampToTime(messages[i].getDate()) + " "
+            << msgUser->getUserName()
+            << "[" << msgUser->getUserLogin() << "] "
+            << "\t[messageID " << messages[i].getId() << "] "
+            << "[userID " << std::to_string(msgUser->getId()) << "]"
+            << std::endl;
+        std::cout << messages[i].getMessage() << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+void IChatInterface::usersList(std::unique_ptr<User[]> users)
+{
+    pg_MaxItems = db->usersCount();
+    pagination();
+    int usersNum = 0;
+    for (int i{pg_StartItem}; i < pg_EndItem && users != nullptr; i++)
+    {
+        if (users[i].getId() != user->getId())
+        {
+            std::cout
+                << ++usersNum << ". "
+
+                << users[i].getUserName()
+                << "[" << users[i].getUserLogin() << "] "
+                << "\t[userID " << std::to_string(users[i].getId()) << "]"
+                << std::endl;
+            std::cout << std::endl;
+        }
+    }
+    std::cout << std::endl;
 }

@@ -46,11 +46,11 @@ public:
     Перед вызовом pagination() надо задать значения переменным класса: pg_MaxItems, pg_itemsPerPage, pg_pageNumber
     paginationMode = page - будет рассчитан диапазон для указанной страницы
     paginationMode = message - рассчитает диапазон pg_StartItem + pg_itemsPerPage
-    paginationMode = last_page - рассчитает диапазон последних pg_itemsPerPage в списке     
+    paginationMode = last_page - рассчитает диапазон последних pg_itemsPerPage в списке
     Если суммирование pg_itemsPerPage выходит за пределы максимального количества элементов списка, диапазон будет урезан.
 
     После вызова pagination() будут вычислены значения переменных pg_maxPageNumber, pg_StartItem, pg_EndItem
-    
+
     Вывести список после пагинации:
     for (int i = pg_StartItem; i < pg_EndItem; i++)
     {
@@ -68,4 +68,8 @@ public:
     /// @param timestamp
     /// @return
     std::string StampToTime(long long timestamp);
+
+    void messagesList(std::unique_ptr<Message[]> messages = nullptr);
+
+    void usersList(std::unique_ptr<User[]> users = nullptr);
 };

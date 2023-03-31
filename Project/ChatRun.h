@@ -4,7 +4,7 @@
 #include "ChatUserInterface.h"
 #include "ChatAdminInterface.h"
 #include "UserInput.h"
-#define test(a) ;
+// #define test(a) ;
 
 class ChatRun
 {
@@ -50,9 +50,9 @@ ChatRun::ChatRun()
     chat::Results result = chat::empty;
     // Объект страницы
     UserInput<std::string, chat::Results> coreAreaPage("Главная станица",
-                                                 "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",
-                                                 "Неверный ввод",
-                                                 3 // количество возможных вариантов ввода
+                                                       "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",
+                                                       "Неверный ввод",
+                                                       3 // количество возможных вариантов ввода
     );
 
     // создание возможных вариантов ввода
