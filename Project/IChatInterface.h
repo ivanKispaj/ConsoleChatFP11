@@ -59,10 +59,10 @@ public:
     */
 
     /// @brief Сброс настроек пагинации (Вывод списка последних 10 элементов)
-    void pg_Default();
+    void pgDefault();
 
     /// @brief Интерактивное меню настроек пагинации. Запрашивает у пользователя данные для отображения диапазона элементов.
-    void chatNavigation();
+    void pgNavigation();
 
     /// @brief Преобразует timestamp в дату/время
     /// @param timestamp

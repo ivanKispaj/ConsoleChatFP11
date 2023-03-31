@@ -125,7 +125,7 @@ std::string IChatInterface::StampToTime(long long timestamp)
     return str;
 }
 
-void IChatInterface::pg_Default()
+void IChatInterface::pgDefault()
 {
     paginationMode = page::last_page;
     pg_pageNumber = 1;
@@ -136,7 +136,7 @@ void IChatInterface::pg_Default()
     pg_EndItem = 0;
 }
 
-void IChatInterface::chatNavigation()
+void IChatInterface::pgNavigation()
 {
     UserInput<std::string, page::PaginationMode> selectOption(std::string(),
                                                         "Выберите опцию:"
