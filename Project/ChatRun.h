@@ -4,7 +4,7 @@
 #include "ChatUserInterface.h"
 #include "ChatAdminInterface.h"
 #include "UserInput.h"
-// #define test(a) ;
+#define test(a) ;
 
 class ChatRun
 {
@@ -46,41 +46,41 @@ ChatRun::ChatRun()
     db->AddMessageToAllUsers(msg);
 #endif
 
-    Results userInput = Results::empty;
-    Results result = Results::empty;
+    chat::Results userInput = chat::empty;
+    chat::Results result = chat::empty;
     // Объект страницы
-    UserInput<std::string, Results> coreAreaPage("Главная станица",
-                                                 "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",
-                                                 "Неверный ввод",
-                                                 3 // количество возможных вариантов ввода
+    UserInput<std::string, chat::Results> coreAreaPage("Главная станица",
+                                                       "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",
+                                                       "Неверный ввод",
+                                                       3 // количество возможных вариантов ввода
     );
 
     // создание возможных вариантов ввода
     coreAreaPage.addInputs("ч", "а", "в");
     // Соответствующие варианты вывода
-    coreAreaPage.addOutputs(Results::chat, Results::admin, Results::app_exit);
+    coreAreaPage.addOutputs(chat::chat, chat::admin, chat::app_exit);
 
     do
     {
         userInput = coreAreaPage.IOgetline();
         switch (userInput)
         {
-        case Results::chat:
+        case chat::chat:
             system(clear);
             result = userInterface.run(std::move(db));
             db = std::move(userInterface.db);
             break;
-        case Results::admin:
+        case chat::admin:
             result = adminInterface.run(std::move(db));
             db = std::move(adminInterface.db);
             break;
-        case Results::app_exit:
-            result = Results::app_exit;
+        case chat::app_exit:
+            result = chat::app_exit;
             break;
         default:
             std::cout << "Неверный ввод" << std::endl;
             break;
         }
-    } while (result != Results::app_exit);
+    } while (result != chat::app_exit);
     std::cout << "Вы вышли из чата. До свидания." << std::endl;
 }

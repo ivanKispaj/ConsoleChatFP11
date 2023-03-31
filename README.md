@@ -37,7 +37,7 @@ adminInterface.run(std::move(db));
 
 С вызова этих методов методов стартует вся дальнейшая логика интерфейса. Из них мы уже вызываем все методы и функции которые будут выводить на экран сообщения показываемые пользователю. Внутри этих методов мы можем использовать любые обращения к базе данных.
 
-userInterface.run  и adminInterface.run должны возвратить элемент перечислителя enum Results. То-есть login_success, register_cancel, app_exit итп.
+userInterface.run  и adminInterface.run должны возвратить элемент перечислителя enum chat::Results. То-есть login_success, register_cancel, app_exit итп.
 
 **Project\IChatInterface**
 Это абстрактный базовый класс. В нем определены и реализованы переменные и методы которые мы можем использовать одновременно в классах ChatUserInterface и ChatAdminInterface
@@ -75,6 +75,6 @@ Result login();
 Это внутренний метод класса не виртуальный. Он реализован и является общим для всех дочерних классов.
 
 ```cpp
- virtual Results run(std::unique_ptr<DB> _db) = 0; 
+ virtual chat::Results run(std::unique_ptr<DB> _db) = 0; 
  ``` 
  Этот метод должен быть реализован в дочерних классах. С него стартуют все другие методы осуществляющие взаимодействие пользователя с программой.

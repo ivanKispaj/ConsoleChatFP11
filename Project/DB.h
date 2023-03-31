@@ -77,6 +77,12 @@ public:
     /// @return  if the array is not empty - std::unique_ptr<User[]> , nullptr if the array is empty!
     const std::unique_ptr<User[]> getAllUsers() const;
 
+    /// @brief Returns an array of users found by name
+    /// @param name User name
+    /// @param size the reference is the size of the array, the created size of the array will be written to it
+    /// @return if the array is not empty - std::unique_ptr<User[]> , nullptr if the array is empty!
+    const std::unique_ptr<User[]> getAllUsers(std::string name, int &size) const;
+
     /// @brief Get a user by login
     /// @param login string -> user login
     /// @param exception
@@ -122,6 +128,12 @@ public:
     /// @param size the reference is the size of the array, the created size of the array will be written to it
     /// @return std::unique_ptr<Message[]> Returns an array
     const std::unique_ptr<Message[]> getAllPrivateMessagesForUsersById(int user1Id, int user2Id, int &size) const;
+
+    /// @brief Returns an array of all incoming/outgoing Private messages between user in chronological ascending order
+    /// @param userId
+    /// @param size the reference is the size of the array, the created size of the array will be written to it
+    /// @return std::unique_ptr<Message[]> Returns an array
+    const std::unique_ptr<Message[]> getAllPrivateMessagesForUserById(int userId, int &size) const;
 
     /// @brief Returns an array of all incoming/outgoing Public messages between users with ID in chronological ascending order
     /// @param Id int ID of the user
