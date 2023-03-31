@@ -144,6 +144,28 @@ const std::unique_ptr<User[]> DB::getAllUsers() const
     return nullptr;
 }
 
+const std::unique_ptr<User[]> DB::getAllUsers(std::string name, int &size) const
+{
+    size = 0;
+    if (_userDB.count() > 0)
+    {
+        std::unique_ptr<User[]> ret(new User[_userDB.count()]);
+        for (int i = 0; i < _userDB.count(); i++)
+        {
+            if (_userDB[i].getUserName() == name)
+            {
+                ret[i] = _userDB[i];
+                size++;
+            }
+        }
+        if (size > 0)
+        {
+            return std::move(ret);
+        }
+    }
+    return nullptr;
+}
+
 const std::unique_ptr<User> DB::getUserByLogin(const std::string &login, bool exception) const
 {
     if (_userDB.count() > 0)
@@ -357,6 +379,38 @@ const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUsersById(int user1
             }
             size = newMessageArray.count();
             return ret;
+        }
+    }
+    return nullptr;
+}
+
+const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUserById(int userId, int &size) const
+{
+    DBCore<Message> newMessageArray;
+
+    if (_messageDB.count() > 0)
+    {
+        bool issetMessage = false;
+        for (int i = 0; i < _messageDB.count(); i++)
+        {
+            if ((_messageDB[i].getAuthorID() == userId) || (_messageDB[i].getRecipientID() == userId))
+            {
+                if (_messageDB[i].isPrivat)
+                {
+                    newMessageArray.append(_messageDB[i]);
+                    issetMessage = true;
+                }
+            }
+        }
+        if (issetMessage)
+        {
+            std::unique_ptr<Message[]> ret(new Message[newMessageArray.count()]);
+            for (int i = 0; i < newMessageArray.count(); i++)
+            {
+                ret[i] = newMessageArray[i];
+            }
+            size = newMessageArray.count();
+            return std::move(ret);
         }
     }
     return nullptr;
