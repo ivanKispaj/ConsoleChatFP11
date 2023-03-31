@@ -69,7 +69,11 @@ public:
     /// @return
     std::string StampToTime(long long timestamp);
 
+    /// @brief Выводит на экран список сообщений
+    /// @param messages массив сообщений
     void messagesList(std::unique_ptr<Message[]> messages = nullptr);
 
+    /// @brief Выводит на экран список пользователей
+    /// @param users массив пользователей
     void usersList(std::unique_ptr<User[]> users = nullptr);
 };

@@ -201,20 +201,15 @@ void IChatInterface::usersList(std::unique_ptr<User[]> users)
 {
     pg_MaxItems = db->usersCount();
     pagination();
-    int usersNum = 0;
     for (int i{pg_StartItem}; i < pg_EndItem && users != nullptr; i++)
     {
-        if (users[i].getId() != user->getId())
-        {
-            std::cout
-                << ++usersNum << ". "
-
-                << users[i].getUserName()
-                << "[" << users[i].getUserLogin() << "] "
-                << "\t[userID " << std::to_string(users[i].getId()) << "]"
-                << std::endl;
-            std::cout << std::endl;
-        }
+        std::cout
+            << i + 1 << ". "
+            << users[i].getUserName()
+            << "[" << users[i].getUserLogin() << "] "
+            << "\t[userID " << std::to_string(users[i].getId()) << "]"
+            << std::endl;
+        std::cout << std::endl;
     }
     std::cout << std::endl;
 }

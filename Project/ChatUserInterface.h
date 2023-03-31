@@ -28,7 +28,7 @@ public:
     chat::Results publicChat();
 
     /// @brief Посылает сообщение в общий чат
-    void sendMessage();
+    void sendMessage(chat::Results result = chat::public_chat);
 
     /// @brief Интерактивное меню личных сообщений. Главная страница. Выбор пользователя для беседы.
     /// @return

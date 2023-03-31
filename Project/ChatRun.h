@@ -4,7 +4,7 @@
 #include "ChatUserInterface.h"
 #include "ChatAdminInterface.h"
 #include "UserInput.h"
-// #define test(a) ;
+#define test(a) ;
 
 class ChatRun
 {

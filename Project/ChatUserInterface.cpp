@@ -156,7 +156,7 @@ chat::Results ChatUserInterface::publicChat()
     return chat::empty;
 }
 
-void ChatUserInterface::sendMessage()
+void ChatUserInterface::sendMessage(chat::Results result)
 {
     Message message;
     std::string messageText;
@@ -165,14 +165,22 @@ void ChatUserInterface::sendMessage()
 
     message.setAuthorID(user->getId());
     message.setMessage(messageText);
-
-    db->AddMessageToAllUsers(message);
+    if (result == chat::public_chat)
+    {
+        db->AddMessageToAllUsers(message);
+        return;
+    }
+    if (result == chat::private_chat)
+    {
+        message.setRecipientID(pm_user->getId());
+        db->addMessage(message);
+    }
 }
 
 chat::Results ChatUserInterface::privateChat()
 {
     system(clear);
-
+    pgDefault();
     UserInput<std::string, chat::Results> privateMainPage("Личные сообщения. Главная страница.",
                                                           "Выбор пользователя:\n"
                                                           "\tл - по логину;\n"
@@ -189,11 +197,14 @@ chat::Results ChatUserInterface::privateChat()
                                chat::user_list,
                                chat::public_chat,
                                chat::back);
-    chat::Results result = chat::public_chat;
+    chat::Results result = chat::private_chat;
     std::string chatDescription;
-    int usersNum = 0;
     do
     {
+        if (result == chat::public_chat)
+        {
+            return chat::public_chat;
+        }
         system(clear);
         auto users = db->getAllUsers();
         if (users == nullptr)
@@ -212,8 +223,8 @@ chat::Results ChatUserInterface::privateChat()
                           user->getUserName() + " [" + user->getUserLogin() + "]\t[userID " + std::to_string(user->getId()) + "]\n" +
                           "Показаны пользователи: " +
                           std::to_string((pg_MaxItems <= 0) ? pg_StartItem : pg_StartItem + 1) + " - " +
-                          std::to_string(pg_EndItem - 1) + " из " +
-                          std::to_string(pg_MaxItems - 1);
+                          std::to_string(pg_EndItem) + " из " +
+                          std::to_string(pg_MaxItems);
 
         privateMainPage.setDescription(chatDescription);
         result = privateMainPage.IOgetline();
@@ -230,16 +241,18 @@ chat::Results ChatUserInterface::privateChat()
             pgNavigation();
             break;
         case chat::public_chat:
-            return chat::public_chat;
+            result = chat::public_chat;
             break;
         case chat::back:
-            return chat::back;
+            result = chat::back;
             break;
         default:
             break;
         }
-    } while (1);
+    } while ((result != chat::public_chat) && (result != chat::back));
 
+    pgDefault();
+    pm_user = nullptr;
     return result;
 }
 
@@ -247,7 +260,7 @@ void ChatUserInterface::searchUser(chat::Results results)
 {
     UserInput<int, int> searchByIdInput("Писк пользователя по userID", "Введите userID: ", "Неверный ввод");
     UserInput<std::string, std::string> searchByLoginInput("Писк пользователя по логину", "Введите логин пользователя: ", "Неверный ввод");
-    if (results = chat::search_user_byId)
+    if (results == chat::search_user_byId)
     {
         int uid = searchByIdInput.IOcinThrough();
         std::unique_ptr<User> _user = db->getUserById(uid);
@@ -269,12 +282,59 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
         return chat::user_not_found;
     }
 
+    system(clear);
+    pgDefault();
+    std::string chatDescription;
+    std::string mainMessage = "Выберите действие: "
+                              "(с - написать сообщение; "
+                              "н - навигация по сообщениям; "
+                              "п - вернуться публичный чат; "
+                              "в - выход из беседы): ";
+
+    UserInput<std::string, chat::Results> chatConversationPage(chatDescription, mainMessage, "Неверный ввод", 4);
+    chatConversationPage.addInputs("с", "н", "п", "в");
+    chatConversationPage.addOutputs(chat::send_message, chat::chat_options, chat::public_chat, chat::back);
+
     do
     {
         auto messages = db->getAllPrivateMessagesForUsersById(user->getId(), pm_user->getId(), pg_MaxItems);
+        messagesList(std::move(messages));
+        if (pg_MaxItems <= 0)
+        {
+            std::cout << "В этом чате нет сообщений. Начните общение первым." << std::endl;
+        }
 
-    } while (1);
-
+        chatDescription = "Личные сообщения. Беседа с пользователем.\n"
+                          "Вы:\t" +
+                          user->getUserName() + " [" + user->getUserLogin() + "]\t[userID " + std::to_string(user->getId()) + "]\n" +
+                          "Ваш собеседник:\t" + pm_user->getUserName() + " [" + pm_user->getUserLogin() + "]\t[userID " + std::to_string(pm_user->getId()) + "]\n" +
+                          std::string((user->getId() == pm_user->getId()) ? "Вы ведете личную беседу с самим собой.\n" : std::string()) +
+                          "Показаны сообщения: " +
+                          std::to_string((pg_MaxItems <= 0) ? pg_StartItem : pg_StartItem + 1) + " - " +
+                          std::to_string(pg_EndItem) + " из " +
+                          std::to_string(pg_MaxItems);
+        chatConversationPage.setDescription(chatDescription);
+        result = chatConversationPage.IOgetline();
+        switch (result)
+        {
+        case chat::send_message:
+            sendMessage(chat::private_chat);
+            break;
+        case chat::chat_options:
+            pgNavigation();
+            break;
+        case chat::public_chat:
+            result = chat::public_chat;
+            break;
+        case chat::back:
+            result = chat::empty;
+            break;
+        default:
+            break;
+        }
+        system(clear);
+    } while ((result != chat::public_chat) && (result != chat::empty));
+    pgDefault();
     pm_user = nullptr;
-    return chat::Results();
+    return result;
 }
