@@ -19,7 +19,7 @@ ChatRun::ChatRun()
     std::unique_ptr<DB> db = std::make_unique<DB>();
     User service_admin("admin", "admin", "1234");
     service_admin.setIsAdmin(true);
-    db->addUser(service_admin); // Service Admin
+    db->addUser(service_admin);                                                         // Service Admin
     db->addUser("complaint_bot", "complaint_bot", "uijyh6758r9ifSDFGH&^tf34rdfcvgtre"); // бот которому отсылаются жалобы пользователей.
 
     ChatUserInterface userInterface;
@@ -35,7 +35,7 @@ ChatRun::ChatRun()
     User u("николай", "nick", "pass");
     u.setIsBanned(true);
     db->addUser(u);
-    
+
     Message msg;
     msg.setMessage("Всем привет!");
     msg.setAuthorID(2);
@@ -49,7 +49,7 @@ ChatRun::ChatRun()
     msg.setAuthorID(4);
     db->AddMessageToAllUsers(msg);
 
-    msg.setMessage("Как у нас дела? 🔴 ;-))))))");
+    msg.setMessage("Надеюсь всё хорошо");
     db->AddMessageToAllUsers(msg);
 #endif
 

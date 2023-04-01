@@ -115,11 +115,12 @@ chat::Results ChatUserInterface::publicChat()
                   "(с - написать сообщение; "
                   "н - настройки; "
                   "л - личные сообщения; "
+                  "ж - пожаловаться; "
                   "в - выход): ";
 
-    UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 4);
-    chatMainPage.addInputs("с", "н", "л", "в");
-    chatMainPage.addOutputs(chat::send_message, chat::chat_options, chat::private_chat, chat::back);
+    UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 5);
+    chatMainPage.addInputs("с", "н", "л", "ж", "в");
+    chatMainPage.addOutputs(chat::send_message, chat::chat_options, chat::private_chat, chat::complaint, chat::back);
 
     chat::Results result = chat::empty;
 
@@ -152,6 +153,9 @@ chat::Results ChatUserInterface::publicChat()
             break;
         case chat::private_chat:
             result = privateChat();
+            break;
+        case chat::complaint:
+            complaint();
             break;
         default:
             break;
@@ -319,7 +323,8 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
             pm_user = nullptr;
             return chat::user_banned;
         }
-        if(pm_user->getUserLogin() == "complaint_bot"){
+        if (pm_user->getUserLogin() == "complaint_bot")
+        {
             pgDefault();
             pm_user = nullptr;
             return chat::user_is_service;
@@ -364,4 +369,90 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
     pgDefault();
     pm_user = nullptr;
     return result;
+}
+
+void ChatUserInterface::complaint()
+{
+    UserInput<std::string, std::string> complainTextIO(std::string(), "Укажите причину жалобы: ", std::string());
+    UserInput<int, int> troubleUserIdIO(std::string(), "Укажите userId пользователя на которого хотите пожаловаться: ", std::string());
+    UserInput<int, int> troubleMsgIdIO(std::string(), "Укажите messageID сообщения на которое хотите пожаловаться: ", std::string());
+    UserInput<std::string, chat::Results> yesnoIO(std::string(), "Отменить жалобу? (да - отменить / нет - не отменять): ", "Неверный ввод", 4);
+    yesnoIO.addInputs("да", "нет", "yes", "no");
+    yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
+
+    std::string text = complainTextIO.IOgetlineThrough(true);
+    std::unique_ptr<User> troubleUser = nullptr;
+    std::unique_ptr<Message> troubleMsg = nullptr;
+
+    int troubleUserId = 0;
+    int troubleMsgId = 0;
+
+    do
+    {
+        troubleUserId = troubleUserIdIO.IOcinThrough();
+        auto _troubleUser = db->getUserById(troubleUserId);
+        if (_troubleUser == nullptr)
+        {
+            yesnoIO.setDescription("Указан неверный userId");
+            chat::Results yesno = yesnoIO.IOgetline();
+            if (yesno == chat::yes)
+            {
+                return;
+            }
+            else if (yesno == chat::no)
+            {
+                continue;
+            }
+        }
+        else
+        {
+            troubleUser = std::move(_troubleUser);
+        }
+
+    } while (troubleUser == nullptr);
+
+    do
+    {
+        troubleMsgId = troubleMsgIdIO.IOcinThrough();
+        auto _troubleMsg = db->getMessage(troubleMsgId);
+        if (_troubleMsg == nullptr)
+        {
+            yesnoIO.setDescription("Указан неверный messageID");
+            chat::Results yesno = yesnoIO.IOgetline();
+            if (yesno == chat::yes)
+            {
+                return;
+            }
+            else if (yesno == chat::no)
+            {
+                continue;
+            }
+        }
+        else
+        {
+            troubleMsg = std::move(_troubleMsg);
+        }
+    } while (troubleMsg == nullptr);
+
+    std::string messageText = "\nЖалоба от пользователя: " +
+                              user->getUserName() +
+                              "[" + user->getUserLogin() + "][userId " + std::to_string(user->getId()) + "]\n" +
+                              "На пользователя: " +
+                              troubleUser->getUserName() +
+                              "[" + troubleUser->getUserLogin() + "][userId " + std::to_string(troubleUser->getId()) + "]\n" +
+                              "Текст жалобы: " + text +
+                              "\nЗа сообщение: [messageId " + std::to_string(troubleMsg->getId()) + "]. Текст сообщения: " + troubleMsg->getMessage() +
+                              "\nuserID автора сообщения: " + std::to_string(troubleMsg->getAuthorID());
+    ;
+
+    yesnoIO.setDescription(messageText);
+    yesnoIO.setMainMessage("Вы действительно хотите отправить эту жалобу администрации чата? (да / нет): ");
+    yesnoIO.IOgetline();
+
+    Message m;
+    m.setAuthorID(user->getId());
+    m.setRecipientID(2);
+    m.setMessage(messageText);
+
+    db->addMessage(m);
 }

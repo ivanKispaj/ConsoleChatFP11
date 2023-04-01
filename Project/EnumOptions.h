@@ -26,6 +26,7 @@ namespace chat
         user_not_found,
         user_banned,
         user_is_service,
+        complaint,
     };
 };
 

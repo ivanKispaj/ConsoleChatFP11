@@ -209,7 +209,7 @@ int DB::usersCount() const
     return _userDB.count();
 }
 
-const std::unique_ptr<Message[]> DB::getAllMessage() const
+const std::unique_ptr<Message[]> DB::getAllMessages() const
 {
     if (_messageDB.count() > 0)
     {
@@ -223,7 +223,22 @@ const std::unique_ptr<Message[]> DB::getAllMessage() const
     return nullptr;
 }
 
-const std::unique_ptr<Message[]> DB::getAllMessageForUserById(int id) const
+const std::unique_ptr<Message> DB::getMessage(const int &messageId) const
+{
+    if (_messageDB.count() > 0)
+    {
+        for (int i = 0; i < _messageDB.count(); i++)
+        {
+            if (_messageDB[i].getId() == messageId)
+            {
+                return std::make_unique<Message>(_messageDB[i]);
+            }
+        }
+    }
+    return nullptr;
+}
+
+const std::unique_ptr<Message[]> DB::getAllMessagesForUserById(int id) const
 {
     DBCore<Message> newMessageArray;
 
