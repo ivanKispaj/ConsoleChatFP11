@@ -76,4 +76,6 @@ public:
     /// @brief Выводит на экран список пользователей
     /// @param users массив пользователей
     void usersList(std::unique_ptr<User[]> users = nullptr);
+
+    void userProfile();
 };

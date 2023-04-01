@@ -218,3 +218,71 @@ void IChatInterface::usersList(std::unique_ptr<User[]> users)
     }
     std::cout << std::endl;
 }
+
+void IChatInterface::userProfile()
+{
+    UserInput<std::string, user::options> options("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]" ,
+                                                  "Какие данные вы хотите поменять? (л - логин; п - пароль; и - имя; з - закончить): ",
+                                                  "Неверный ввод",
+                                                  4);
+    options.addInputs("л", "п", "и", "з");
+    options.addOutputs(user::login, user::pass, user::name, user::end);
+
+    UserInput<std::string, std::string> getLogin("Изменение логина", "Введите логин: ", std::string());
+    UserInput<std::string, std::string> getName("Изменение имени", "Введите имя: ", std::string());
+    UserInput<std::string, std::string> getPass("Изменение пароля", "Введите пароль: ", std::string());
+    UserInput<std::string, chat::Results> loginCancel(std::string(), "Отменить смену логина? (да - отменить, нет - продолжить): ", "Неверный ввод. Требуется: да или нет", 4);
+    loginCancel.addInputs("да", "нет", "yes", "no");
+    loginCancel.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
+
+    std::string login;
+    std::string name;
+    std::string pass;
+
+    do
+    {
+        options.setDescription("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]" );
+        user::options result = options.IOgetline();
+        switch (result)
+        {
+        case user::login:
+        {
+            // ввод логина
+            bool validLogin = false;
+            do
+            {
+                login = getLogin.IOgetlineThrough(true);
+
+                validLogin = db->isUniqueLogin(login);
+                if (!validLogin)
+                {
+                    std::cout << "Этот логин занят!" << std::endl;
+                    if (loginCancel.IOgetline() == chat::yes)
+                    {
+                        break;
+                    }
+                }
+                user->setUserLogin(login);
+                db->updateUserData(*user);
+
+            } while (!validLogin);
+        }
+        break;
+        case user::name:
+            name = getName.IOgetlineThrough(true);
+            user->setUserName(name);
+            db->updateUserData(*user);
+            break;
+
+        case user::pass:
+            pass = getPass.IOgetlineThrough(true);
+            db->setUserPassword(user->getId(), pass);
+            break;
+        case user::end:
+            return;
+        default:
+            break;
+        }
+
+    } while (1);
+}

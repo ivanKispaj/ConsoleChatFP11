@@ -26,10 +26,20 @@ namespace chat
         user_not_found,
         user_banned,
         user_is_service,
+        user_profile,
         complaint,
     };
 };
-
+namespace user
+{
+    enum options
+    {
+        login,
+        pass,
+        name,
+        end
+    };
+};
 namespace page
 {
     enum PaginationMode

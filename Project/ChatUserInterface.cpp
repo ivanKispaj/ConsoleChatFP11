@@ -113,14 +113,15 @@ chat::Results ChatUserInterface::publicChat()
 
     mainMessage = "Выберите действие: "
                   "(с - написать сообщение; "
-                  "н - настройки; "
+                  "н - навигация по чату; "
                   "л - личные сообщения; "
                   "ж - пожаловаться; "
+                  "п - настройки профиля"
                   "в - выход): ";
 
-    UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 5);
-    chatMainPage.addInputs("с", "н", "л", "ж", "в");
-    chatMainPage.addOutputs(chat::send_message, chat::chat_options, chat::private_chat, chat::complaint, chat::back);
+    UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 6);
+    chatMainPage.addInputs("с", "н", "л", "ж", "п", "в");
+    chatMainPage.addOutputs(chat::send_message, chat::chat_options, chat::private_chat, chat::complaint, chat::user_profile, chat::back);
 
     chat::Results result = chat::empty;
 
@@ -156,6 +157,9 @@ chat::Results ChatUserInterface::publicChat()
             break;
         case chat::complaint:
             complaint();
+            break;
+        case chat::user_profile:
+            userProfile();
             break;
         default:
             break;
