@@ -269,7 +269,7 @@ const std::unique_ptr<Message[]> DB::getAllMessagesForUserById(int id) const
 
 bool DB::updateUserData(const User &user)
 {
-    if (_userDB.count() > 0 && !(isUniqueLogin(user.getUserLogin())))
+    if (_userDB.count() > 0)
     {
         for (int i = 0; i < _userDB.count(); i++)
         {
