@@ -12,6 +12,10 @@ chat::Results ChatUserInterface::run(std::unique_ptr<DB> _db)
     do
     {
         system(clear);
+        if (userInput == chat::user_banned)
+        {
+            std::cout << "Пользователь заблокирован администратором" << std::endl;
+        }
         userInput = chatAreaPage.IOgetline();
         switch (userInput)
         {
@@ -44,6 +48,7 @@ chat::Results ChatUserInterface::loginInChat()
     {
         return publicChat();
     }
+
     return result;
 }
 

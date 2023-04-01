@@ -29,6 +29,10 @@ ChatRun::ChatRun()
     db->addUser("Ирина", "Fineralla", "pass"); // 4
     db->addUser("Vasya", "vas", "pass");       // 5
 
+    User u("николай", "nick", "pass");
+    u.setIsBannded(true);
+    db->addUser(u);
+    
     Message msg;
     msg.setMessage("Всем привет!");
     msg.setAuthorID(2);
