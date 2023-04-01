@@ -51,6 +51,11 @@ chat::Results IChatInterface::login()
             }
         }
     } while (!validate);
+
+    if (user->isBanned())
+    {
+        return chat::user_banned;
+    }
     return chat::login_success;
 }
 

@@ -24,6 +24,7 @@ namespace chat
         search_user_byLogin,
         user_list,
         user_not_found,
+        user_banned,
     };
 };
 
