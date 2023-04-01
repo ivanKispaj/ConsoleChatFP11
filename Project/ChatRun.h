@@ -30,7 +30,7 @@ ChatRun::ChatRun()
     db->addUser("Vasya", "vas", "pass");       // 5
 
     User u("николай", "nick", "pass");
-    u.setIsBannded(true);
+    u.setIsBanned(true);
     db->addUser(u);
     
     Message msg;

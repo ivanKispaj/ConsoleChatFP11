@@ -15,7 +15,7 @@ struct Message
 
     // true - a message from a private chat
     // false = true - a message from a public chat
-    bool isPrivat{false};
+    bool isPrivate{false};
 
     /// @brief default init
     Message() = default;
@@ -28,7 +28,7 @@ struct Message
     /// @param authorID int author ID
     /// @param recipientID int recipient ID
     /// @param privateChat bool -> true - private chat / false - public chat
-    Message(const std::string message, int authorID, int recipientID, bool privateChat = false) : isPrivat(privateChat),
+    Message(const std::string message, int authorID, int recipientID, bool privateChat = false) : isPrivate(privateChat),
                                                                                                   _message(message),
                                                                                                   _authorID(authorID),
                                                                                                   _recipientID(recipientID) {}

@@ -115,7 +115,7 @@ public:
     /// @brief Deletes the user's account, marked as deleted. The password is reset, the name is changed to the "deleted"
     /// @param user struct User
     /// @return true if successful, false if not a unique login, no user, no users
-    bool deleteUserAccount(User &user); // true -> if accaunt deleted, false -> failed
+    bool deleteUserAccount(User &user); // true -> if account deleted, false -> failed
 
     /// @brief
     /// @param message
