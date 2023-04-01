@@ -218,11 +218,22 @@ chat::Results ChatUserInterface::privateChat()
         }
 
         usersList(std::move(users));
-
-        if (result == chat::user_not_found)
+        switch (result)
         {
+        case chat::user_not_found:
             std::cout << "Пользователь не найден." << std::endl;
+            break;
+        case chat::user_banned:
+            std::cout << "Пользователь заблокирован администратором." << std::endl;
+            break;
+        case chat::user_is_service:
+            std::cout << "C этим пользователем нельзя вести личные беседы." << std::endl;
+            break;
+
+        default:
+            break;
         }
+
         chatDescription = "Личные сообщения. Главная страница.\n"
                           "Вы: " +
                           user->getUserName() + " [" + user->getUserLogin() + "]\t[userID " + std::to_string(user->getId()) + "]\n" +
@@ -302,6 +313,17 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
 
     do
     {
+        if (pm_user->isBanned())
+        {
+            pgDefault();
+            pm_user = nullptr;
+            return chat::user_banned;
+        }
+        if(pm_user->getUserLogin() == "complaint_bot"){
+            pgDefault();
+            pm_user = nullptr;
+            return chat::user_is_service;
+        }
         auto messages = db->getAllPrivateMessagesForUsersById(user->getId(), pm_user->getId(), pg_MaxItems);
         messagesList(std::move(messages));
         if (pg_MaxItems <= 0)
