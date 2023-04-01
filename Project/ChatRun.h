@@ -17,7 +17,10 @@ public:
 ChatRun::ChatRun()
 {
     std::unique_ptr<DB> db = std::make_unique<DB>();
-    db->addUser("admin", "admin", "1234"); // ServiceAdmin
+    User service_admin("admin", "admin", "1234");
+    service_admin.setIsAdmin(true);
+    db->addUser(service_admin); // Service Admin
+    db->addUser("complaint_bot", "complaint_bot", "uijyh6758r9ifSDFGH&^tf34rdfcvgtre"); // бот которому отсылаются жалобы пользователей.
 
     ChatUserInterface userInterface;
     ChatAdminInterface adminInterface;
