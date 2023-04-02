@@ -163,8 +163,7 @@ void IChatInterface::pgNavigation()
         paginationMode = page::message;
         break;
     case page::last_page:
-        pg_MaxItems = 10;
-        paginationMode = page::last_page;
+        pgDefault();
     default:
         break;
     }
