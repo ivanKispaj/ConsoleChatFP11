@@ -153,7 +153,7 @@ void IChatInterface::pgNavigation()
         pg_itemsPerPage = getInt.IOcinThrough();
         break;
     case page::page:
-        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber - 1) + "): ");
+        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber) + "): ");
         pg_pageNumber = getInt.IOcinThrough();
         paginationMode = page::page;
         break;
