@@ -26,8 +26,8 @@ public:
         std::string out;
         for (int i = 0; i < pass.size(); i++)
         {
-            char simbol = pass[i] << 4;
-            out.push_back(simbol);
+            char symbol = pass[i] << 4;
+            out.push_back(symbol);
             out.push_back(_salt[i]);
         }
         pass = out;

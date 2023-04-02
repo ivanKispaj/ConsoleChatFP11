@@ -64,6 +64,9 @@ public:
     /// @brief Интерактивное меню настроек пагинации. Запрашивает у пользователя данные для отображения диапазона элементов.
     void pgNavigation();
 
+    /// @brief Возвращает информацию о количестве элементов в списке
+    std::string pgInfo();
+
     /// @brief Преобразует timestamp в дату/время
     /// @param timestamp
     /// @return
@@ -76,4 +79,6 @@ public:
     /// @brief Выводит на экран список пользователей
     /// @param users массив пользователей
     void usersList(std::unique_ptr<User[]> users = nullptr);
+
+    void userProfile();
 };
