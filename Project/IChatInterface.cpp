@@ -199,9 +199,11 @@ void IChatInterface::messagesList(std::unique_ptr<Message[]> messages)
             << i + 1 << ". "
             << StampToTime(messages[i].getDate()) + " "
             << msgUser->getUserName()
-            << "[" << msgUser->getUserLogin() << "] "
-            << "\t[messageID " << messages[i].getId() << "] "
+            << "[" << msgUser->getUserLogin() << "]"
             << "[userID " << std::to_string(msgUser->getId()) << "]"
+            << (msgUser->isBanned() ? "[banned]" : std::string())
+            << (msgUser->isAdmin() ? "[admin]" : std::string())
+            << " [messageID " << messages[i].getId() << "] "            
             << std::endl;
         std::cout << messages[i].getMessage() << std::endl;
     }

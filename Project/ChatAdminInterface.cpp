@@ -187,6 +187,8 @@ void ChatAdminInterface::usersManage()
     usersPage.addInputs("б", "р", "а", "на", "нс", "н");
     usersPage.addOutputs(chat::user_ban,
                          chat::user_unban,
+                         chat::user_admin,
+                         chat::user_not_admin,
                          chat::chat_options,
                          chat::back);
     chat::Results result = chat::empty;
@@ -230,6 +232,22 @@ void ChatAdminInterface::usersManage()
             if (pg_MaxItems > 0)
             {
                 userBan(false);
+            }
+        }
+        break;
+        case chat::user_admin:
+        {
+            if (pg_MaxItems > 0)
+            {
+                userSetAdmin(true);
+            }
+        }
+        break;
+        case chat::user_not_admin:
+        {
+            if (pg_MaxItems > 0)
+            {
+                userSetAdmin(false);
             }
         }
         break;
@@ -299,8 +317,28 @@ void ChatAdminInterface::userBan(bool ban)
         {
             if ((user->getId() == _user->getId()) || (_user->getId() == 2) || (_user->getId() == 1))
             {
-                std::cout << "Нельзя забанить самого себя или сервисных админа или бота." << std::endl;
+                std::cout << "Операция недопустима для себя или сервисных админа или бота." << std::endl;
                 yesnoIO.setMainMessage("Выйти из меню блокировки пользователей? (да - выйти / нет - не выходить): ");
+                if (yesnoIO.IOgetline() == chat::yes)
+                {
+                    return;
+                }
+                continue;
+            }
+            if ((_user->isBanned() == ban) && ban)
+            {
+                std::cout << "Пользователь уже заблокирован." << std::endl;
+                yesnoIO.setMainMessage("Выйти? (да - выйти / нет - не выходить): ");
+                if (yesnoIO.IOgetline() == chat::yes)
+                {
+                    return;
+                }
+                continue;
+            }
+            if ((_user->isBanned() == ban) && !ban)
+            {
+                std::cout << "Пользователь не заблокирован." << std::endl;
+                yesnoIO.setMainMessage("Выйти? (да - выйти / нет - не выходить): ");
                 if (yesnoIO.IOgetline() == chat::yes)
                 {
                     return;
@@ -342,6 +380,7 @@ void ChatAdminInterface::userSetAdmin(bool adm)
     yesnoIO.addInputs("да", "нет", "yes", "no");
     yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
     int userId = 0;
+    auto result = chat::empty;
     do
     {
         userId = getUser.IOcinThrough();
@@ -354,12 +393,36 @@ void ChatAdminInterface::userSetAdmin(bool adm)
                 yesnoIO.setMainMessage("Выйти? (да - выйти / нет - не выходить): ");
                 if (yesnoIO.IOgetline() == chat::yes)
                 {
+
                     return;
                 }
                 continue;
             }
-            if(_user->isBanned()){
+            if (_user->isBanned())
+            {
                 std::cout << "Этот пользователь заблокирован. Его нельзя сделать администратором." << std::endl;
+                yesnoIO.setMainMessage("Выйти? (да - выйти / нет - не выходить): ");
+                if (yesnoIO.IOgetline() == chat::yes)
+                {
+
+                    return;
+                }
+                continue;
+            }
+            if ((_user->isAdmin() == adm) && adm)
+            {
+                std::cout << "Пользователь уже администратор." << std::endl;
+                yesnoIO.setMainMessage("Выйти? (да - выйти / нет - не выходить): ");
+                if (yesnoIO.IOgetline() == chat::yes)
+                {
+
+                    return;
+                }
+                continue;
+            }
+            if ((_user->isAdmin() == adm) && !adm)
+            {
+                std::cout << "Пользователь не является администратором." << std::endl;
                 yesnoIO.setMainMessage("Выйти? (да - выйти / нет - не выходить): ");
                 if (yesnoIO.IOgetline() == chat::yes)
                 {
@@ -380,6 +443,7 @@ void ChatAdminInterface::userSetAdmin(bool adm)
             {
                 _user->setIsAdmin(adm);
                 db->updateUserData(*_user);
+
                 return;
             }
             else

@@ -34,6 +34,7 @@ namespace chat
         user_unban,
         user_admin,
         user_not_admin,
+        end,
     };
 };
 namespace user
