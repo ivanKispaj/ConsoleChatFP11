@@ -170,6 +170,13 @@ void IChatInterface::pgNavigation()
     }
 }
 
+std::string IChatInterface::pgInfo()
+{
+    return std::to_string((pg_MaxItems <= 0) ? pg_StartItem : pg_StartItem + 1) + " - " +
+           std::to_string(pg_EndItem) + " из " +
+           std::to_string(pg_MaxItems);
+}
+
 std::string IChatInterface::StampToTime(long long timestamp)
 {
     time_t tick = (time_t)(timestamp);
@@ -221,7 +228,7 @@ void IChatInterface::usersList(std::unique_ptr<User[]> users)
 
 void IChatInterface::userProfile()
 {
-    UserInput<std::string, user::options> options("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]" ,
+    UserInput<std::string, user::options> options("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]",
                                                   "Какие данные вы хотите поменять? (л - логин; п - пароль; и - имя; з - закончить): ",
                                                   "Неверный ввод",
                                                   4);
@@ -241,7 +248,7 @@ void IChatInterface::userProfile()
 
     do
     {
-        options.setDescription("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]" );
+        options.setDescription("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]");
         user::options result = options.IOgetline();
         switch (result)
         {

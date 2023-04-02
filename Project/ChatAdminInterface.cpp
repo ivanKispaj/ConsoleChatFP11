@@ -37,16 +37,17 @@ void ChatAdminInterface::mainPage()
     auto result = chat::empty;
     do
     {
+        result = adminAreaPage.IOgetline();
         switch (result)
         {
         case chat::user_list:
-            complaintManage();
+            usersManage();
             break;
         case chat::messages:
             messagesManage();
             break;
         case chat::complaint:
-            usersManage();
+            complaintManage();
             break;
         case chat::back:
             return;
@@ -64,13 +65,15 @@ void ChatAdminInterface::complaintManage()
     UserInput<std::string, chat::Results> complaintPage("Список жалоб",
                                                         "Опции: "
                                                         "\nу - удаление жалобы;"
+                                                        "\nнс - навигация по списку жалоб;"
                                                         "\nп - управление пользователями;"
                                                         "\nс - управление сообщениями;"
                                                         "\nн - назад;"
                                                         "\nУкажите опцию: ",
-                                                        "Неверный ввод", 4);
-    complaintPage.addInputs("у", "п", "с", "н");
+                                                        "Неверный ввод", 5);
+    complaintPage.addInputs("у", "нс", "п", "с", "н");
     complaintPage.addOutputs(chat::delete_message,
+                             chat::chat_options,
                              chat::user_list,
                              chat::messages,
                              chat::back);
@@ -78,10 +81,29 @@ void ChatAdminInterface::complaintManage()
     std::string chatDescription;
     do
     {
+        system(clear);
+        auto complaintList = db->getAllPrivateMessagesForUserById(complaintBot->getId(), pg_MaxItems);
+
+        messagesList(std::move(complaintList));
+        chatDescription = "Список жалоб. Показаны жалобы: " + pgInfo();
+        complaintPage.setDescription(chatDescription);
+        result = complaintPage.IOgetline();
         switch (result)
         {
         case chat::delete_message:
-            /* code */
+            deleteMessage();
+            break;
+        case chat::chat_options:
+            pgNavigation();
+            break;
+        case chat::user_list:
+            usersManage();
+            break;
+        case chat::messages:
+            usersManage();
+            break;
+        case chat::back:
+            return;
             break;
 
         default:
