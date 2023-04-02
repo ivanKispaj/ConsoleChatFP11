@@ -111,13 +111,14 @@ chat::Results ChatUserInterface::publicChat()
     std::string chatDescription;
     std::string mainMessage;
 
-    mainMessage = "Выберите действие: "
-                  "(с - написать сообщение; "
-                  "н - навигация по чату; "
-                  "л - личные сообщения; "
-                  "ж - пожаловаться; "
-                  "п - настройки профиля"
-                  "в - выход): ";
+    mainMessage = "Операции в чате: "
+                  "\nс - написать сообщение;"
+                  "\nн - навигация по чату;"
+                  "\nл - личные сообщения;"
+                  "\nж - пожаловаться;"
+                  "\nп - настройки профиля;"
+                  "\nв - выход;"
+                  "\nУкажите операцию: ";
 
     UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 6);
     chatMainPage.addInputs("с", "н", "л", "ж", "п", "в");
@@ -377,14 +378,14 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
 
 void ChatUserInterface::complaint()
 {
-    UserInput<std::string, std::string> complainTextIO(std::string(), "Укажите причину жалобы: ", std::string());
+    UserInput<std::string, std::string> complaintTextIO(std::string(), "Укажите причину жалобы: ", std::string());
     UserInput<int, int> troubleUserIdIO(std::string(), "Укажите userId пользователя на которого хотите пожаловаться: ", std::string());
     UserInput<int, int> troubleMsgIdIO(std::string(), "Укажите messageID сообщения на которое хотите пожаловаться: ", std::string());
     UserInput<std::string, chat::Results> yesnoIO(std::string(), "Отменить жалобу? (да - отменить / нет - не отменять): ", "Неверный ввод", 4);
     yesnoIO.addInputs("да", "нет", "yes", "no");
     yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
 
-    std::string text = complainTextIO.IOgetlineThrough(true);
+    std::string text = complaintTextIO.IOgetlineThrough(true);
     std::unique_ptr<User> troubleUser = nullptr;
     std::unique_ptr<Message> troubleMsg = nullptr;
 
