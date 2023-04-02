@@ -21,11 +21,11 @@ ChatRun::ChatRun()
     db->addUser(service_admin);                                                         // Service Admin userID = 1;
     db->addUser("complaint_bot", "complaint_bot", "uijyh6758r9ifSDFGH&^tf34rdfcvgtre"); // бот которому отсылаются жалобы пользователей. userID = 2;
 
-    std::cout << "Логин сервисного администратора: admin, пароль: 1234"<< std::endl;
-    std::cout << "Рекомендуем сменить пароль. Войдите в чат -> настройки профиля."<< std::endl;
-    std::cout << "Это сообщение больше не будет отображаться."<< std::endl;
+    std::cout << "Логин сервисного администратора: admin, пароль: 1234" << std::endl;
+    std::cout << "Рекомендуем сменить пароль. Войдите в чат -> настройки профиля." << std::endl;
+    std::cout << "Это сообщение больше не будет отображаться." << std::endl;
     std::cout << std::endl;
-    
+
     ChatUserInterface userInterface;
     ChatAdminInterface adminInterface;
 

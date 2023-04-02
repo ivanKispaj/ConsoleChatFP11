@@ -310,11 +310,12 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
     system(clear);
     pgDefault();
     std::string chatDescription;
-    std::string mainMessage = "Выберите действие: "
-                              "(с - написать сообщение; "
-                              "н - навигация по сообщениям; "
-                              "п - вернуться публичный чат; "
-                              "в - выход из беседы): ";
+    std::string mainMessage = "Опции: "
+                              "\nс - написать сообщение; "
+                              "\nн - навигация по сообщениям; "
+                              "\nп - вернуться публичный чат; "
+                              "\nв - выход из беседы;"
+                              "\nВыберите опцию: ";
 
     UserInput<std::string, chat::Results> chatConversationPage(chatDescription, mainMessage, "Неверный ввод", 4);
     chatConversationPage.addInputs("с", "н", "п", "в");
