@@ -20,7 +20,7 @@ private:
     long long int _id{0};
     static long long int _currentId;
     bool _isAdmin{false};   // true if the user is an admin
-    bool _isBanned{false};  // true if the user is an bannded
+    bool _isBanned{false};  // true if the user is an banned
     bool _isDeleted{false}; // true if the user is an deleted account
 
 #undef private
@@ -40,7 +40,7 @@ private:
 
     /// @brief increases the message counter when adding messages to the database (DB)
     ///        private method, the DB class has access to
-    void addedMesage(int count = 1);
+    void addedMessage(int count = 1);
 
     /// @brief Creates a user ID when creating a user
     ///        private method, the DB class has access to
@@ -63,7 +63,7 @@ public:
 
     /// @brief init
     /// @param name  string user name
-    /// @param login string user logun unique!
+    /// @param login string user login unique!
     User(const std::string &name, const std::string &login) : _name(name), _login(login) {}
 
     /// @brief init
@@ -118,7 +118,7 @@ public:
 
     /// @brief Sets the status of the user banned if true is passed
     /// @param isBanned pass true if the user is an banned, or it will false
-    void setIsBannded(bool isBanned);
+    void setIsBanned(bool isBanned);
 
     /// @brief Erases user data , except for ID and Login, or it will false
     void deleteThisData();

@@ -17,7 +17,10 @@ public:
 ChatRun::ChatRun()
 {
     std::unique_ptr<DB> db = std::make_unique<DB>();
-    db->addUser("admin", "admin", "1234"); // ServiceAdmin
+    User service_admin("admin", "admin", "1234");
+    service_admin.setIsAdmin(true);
+    db->addUser(service_admin);                                                         // Service Admin userID = 1;
+    db->addUser("complaint_bot", "complaint_bot", "uijyh6758r9ifSDFGH&^tf34rdfcvgtre"); // бот которому отсылаются жалобы пользователей. userID = 2;
 
     ChatUserInterface userInterface;
     ChatAdminInterface adminInterface;
@@ -29,21 +32,38 @@ ChatRun::ChatRun()
     db->addUser("Ирина", "Fineralla", "pass"); // 4
     db->addUser("Vasya", "vas", "pass");       // 5
 
+    User u("николай", "nick", "pass");
+    u.setIsBanned(true);
+    db->addUser(u);
+
     Message msg;
     msg.setMessage("Всем привет!");
-    msg.setAuthorID(2);
-    db->AddMessageToAllUsers(msg);
-
-    msg.setMessage("И тебе привет 👋!");
     msg.setAuthorID(3);
     db->AddMessageToAllUsers(msg);
 
-    msg.setMessage("Как у нас дела? 🔥 ;-))))))");
+    msg.setMessage("И тебе привет 👋!");
     msg.setAuthorID(4);
     db->AddMessageToAllUsers(msg);
 
-    msg.setMessage("Как у нас дела? 🔴 ;-))))))");
+    msg.setMessage("Как у нас дела? 🔥 ;-))))))");
+    msg.setAuthorID(5);
     db->AddMessageToAllUsers(msg);
+
+    msg.setMessage("Надеюсь всё хорошо");
+    db->AddMessageToAllUsers(msg);
+
+    msg.setMessage("Жалоба 1");
+    msg.setRecipientID(2);
+    msg.setAuthorID(3);
+    msg.isPrivate = true;
+    db->addMessage(msg);
+
+    msg.setMessage("Жалоба 2");
+    db->addMessage(msg);
+
+    msg.setMessage("Жалоба 3");
+    db->addMessage(msg);
+
 #endif
 
     chat::Results userInput = chat::empty;

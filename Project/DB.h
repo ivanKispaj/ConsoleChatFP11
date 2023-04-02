@@ -100,12 +100,14 @@ public:
 
     /// @brief Returns an array of all messages
     /// @return if the array is not empty - std::unique_ptr<Message[]>, nullptr if the array is empty!
-    const std::unique_ptr<Message[]> getAllMessage() const;
+    const std::unique_ptr<Message[]> getAllMessages() const;
+
+    const std::unique_ptr<Message> getMessage(const int &messageId) const;
 
     /// @brief Returns an array of all incoming/outgoing messages for - user with ID, in chronological ascending order
     /// @param id int unique recipientID
     /// @return if the array is not empty - std::unique_ptr<Message[]>, nullptr if the array is empty!
-    const std::unique_ptr<Message[]> getAllMessageForUserById(int id) const;
+    const std::unique_ptr<Message[]> getAllMessagesForUserById(int id) const;
 
     /// @brief Updates the user's data (name, login), except for the password!
     /// @param user struct User
@@ -115,7 +117,7 @@ public:
     /// @brief Deletes the user's account, marked as deleted. The password is reset, the name is changed to the "deleted"
     /// @param user struct User
     /// @return true if successful, false if not a unique login, no user, no users
-    bool deleteUserAccount(User &user); // true -> if accaunt deleted, false -> failed
+    bool deleteUserAccount(User &user); // true -> if account deleted, false -> failed
 
     /// @brief
     /// @param message
