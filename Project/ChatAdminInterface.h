@@ -15,5 +15,6 @@ public:
     void messagesManage();
     void usersManage();
     void deleteMessage(bool complaint_only = false);
-    void userBan();
+    void userBan(bool ban = true);
+    void userSetAdmin(bool adm = true);
 };

@@ -30,6 +30,10 @@ namespace chat
         complaint,
         messages,
         delete_message,
+        user_ban,
+        user_unban,
+        user_admin,
+        user_not_admin,
     };
 };
 namespace user

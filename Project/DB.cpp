@@ -278,6 +278,8 @@ bool DB::updateUserData(const User &user)
             {
                 _userDB[i].setUserName(user.getUserName());
                 _userDB[i].setUserLogin(user.getUserLogin());
+                _userDB[i].setIsBanned(user.isBanned());
+                _userDB[i].setIsAdmin(user.isAdmin());
                 return true;
             }
         }

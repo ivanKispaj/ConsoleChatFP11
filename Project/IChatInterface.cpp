@@ -217,8 +217,10 @@ void IChatInterface::usersList(std::unique_ptr<User[]> users)
         std::cout
             << i + 1 << ". "
             << users[i].getUserName()
-            << "[" << users[i].getUserLogin() << "] "
-            << "\t[userID " << std::to_string(users[i].getId()) << "]"
+            << "[" << users[i].getUserLogin() << "]"
+            << "[userID " << std::to_string(users[i].getId()) << "]"
+            << (users[i].isBanned() ? "[banned]" : std::string())
+            << (users[i].isAdmin() ? "[admin]" : std::string())
             << std::endl;
         std::cout << std::endl;
     }
