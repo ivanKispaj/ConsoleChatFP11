@@ -85,24 +85,14 @@ void ChatAdminInterface::complaintManage()
         auto complaintList = db->getAllPrivateMessagesForUserById(complaintBot->getId(), pg_MaxItems);
 
         messagesList(std::move(complaintList));
-
-        if (pg_MaxItems <= 0)
-        {
-            std::cout << "Жалобы отсутствуют." << std::endl;
-        }
         chatDescription = "Список жалоб. Показаны жалобы: " + pgInfo();
         complaintPage.setDescription(chatDescription);
         result = complaintPage.IOgetline();
         switch (result)
         {
         case chat::delete_message:
-        {
-            if (pg_MaxItems > 0)
-            {
-                deleteMessage(true);
-            }
-        }
-        break;
+            deleteMessage();
+            break;
         case chat::chat_options:
             pgNavigation();
             break;
@@ -130,37 +120,8 @@ void ChatAdminInterface::usersManage()
 {
 }
 
-void ChatAdminInterface::deleteMessage(bool complaint_only)
+void ChatAdminInterface::deleteMessage()
 {
-    UserInput<int, int> getMessage(std::string(), "Укажите messageId: ", std::string());
-    UserInput<std::string, chat::Results> yesnoIO(std::string(), "Вы действительно хотите удалить сообщение? (да - удалить / нет - не удалять): ", "Неверный ввод. Требуется да или нет", 4);
-    yesnoIO.addInputs("да", "нет", "yes", "no");
-    yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
-    int msgId = 0;
-    do
-    {
-        int msgId = getMessage.IOcinThrough();
-        auto message = db->getMessage(msgId);
-        if (message != nullptr)
-        {
-            if (complaint_only && (message->getRecipientID() != 2))
-            {
-                std::cout << "Сообщение не является жалобой." << std::endl;
-                continue;
-            }
-            auto result = yesnoIO.IOgetline();
-            if (result == chat::yes)
-            {
-                db->deleteMessageById(msgId);
-                return;
-            }
-            else
-            {
-                return;
-            }
-        }
-        std::cout << "Указан неверный messageId" << std::endl;
-    } while (true);
 }
 
 void ChatAdminInterface::userBan()

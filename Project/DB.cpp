@@ -163,7 +163,6 @@ const std::unique_ptr<User[]> DB::getAllUsers(std::string name, int &size) const
             return std::move(ret);
         }
     }
-    size = 0;
     return nullptr;
 }
 
@@ -399,7 +398,6 @@ const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUsersById(int user1
             return std::move(ret);
         }
     }
-    size = 0;
     return nullptr;
 }
 
@@ -432,7 +430,6 @@ const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUserById(int userId
             return std::move(ret);
         }
     }
-    size = 0;
     return nullptr;
 }
 
@@ -468,7 +465,6 @@ const std::unique_ptr<Message[]> DB::getAllPublicMessagesForUserById(int Id, int
             return std::move(ret);
         }
     }
-    size = 0;
     return nullptr;
 }
 
@@ -503,6 +499,5 @@ const std::unique_ptr<Message[]> DB::getAllPublicMessages(int &size) const
             return std::move(ret);
         }
     }
-    size = 0;
     return nullptr;
 }
