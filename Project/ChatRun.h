@@ -4,7 +4,6 @@
 #include "ChatUserInterface.h"
 #include "ChatAdminInterface.h"
 #include "UserInput.h"
-#define test(a) ;
 
 class ChatRun
 {
@@ -22,49 +21,13 @@ ChatRun::ChatRun()
     db->addUser(service_admin);                                                         // Service Admin userID = 1;
     db->addUser("complaint_bot", "complaint_bot", "uijyh6758r9ifSDFGH&^tf34rdfcvgtre"); // бот которому отсылаются жалобы пользователей. userID = 2;
 
+    std::cout << "Логин сервисного администратора: admin, пароль: 1234" << std::endl;
+    std::cout << "Рекомендуем сменить пароль. Войдите в чат -> настройки профиля." << std::endl;
+    std::cout << "Это сообщение больше не будет отображаться." << std::endl;
+    std::cout << std::endl;
+
     ChatUserInterface userInterface;
     ChatAdminInterface adminInterface;
-
-// тестовые сообщения и пользователи
-#ifdef test
-    db->addUser("Максим", "mmn", "pass");      // 2
-    db->addUser("Иван", "ivanKispaj", "pass"); // 3
-    db->addUser("Ирина", "Fineralla", "pass"); // 4
-    db->addUser("Vasya", "vas", "pass");       // 5
-
-    User u("николай", "nick", "pass");
-    u.setIsBanned(true);
-    db->addUser(u);
-
-    Message msg;
-    msg.setMessage("Всем привет!");
-    msg.setAuthorID(3);
-    db->AddMessageToAllUsers(msg);
-
-    msg.setMessage("И тебе привет 👋!");
-    msg.setAuthorID(4);
-    db->AddMessageToAllUsers(msg);
-
-    msg.setMessage("Как у нас дела? 🔥 ;-))))))");
-    msg.setAuthorID(5);
-    db->AddMessageToAllUsers(msg);
-
-    msg.setMessage("Надеюсь всё хорошо");
-    db->AddMessageToAllUsers(msg);
-
-    msg.setMessage("Жалоба 1");
-    msg.setRecipientID(2);
-    msg.setAuthorID(3);
-    msg.isPrivate = true;
-    db->addMessage(msg);
-
-    msg.setMessage("Жалоба 2");
-    db->addMessage(msg);
-
-    msg.setMessage("Жалоба 3");
-    db->addMessage(msg);
-
-#endif
 
     chat::Results userInput = chat::empty;
     chat::Results result = chat::empty;

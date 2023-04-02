@@ -153,7 +153,7 @@ void IChatInterface::pgNavigation()
         pg_itemsPerPage = getInt.IOcinThrough();
         break;
     case page::page:
-        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber - 1) + "): ");
+        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber) + "): ");
         pg_pageNumber = getInt.IOcinThrough();
         paginationMode = page::page;
         break;
@@ -203,7 +203,7 @@ void IChatInterface::messagesList(std::unique_ptr<Message[]> messages)
             << "[userID " << std::to_string(msgUser->getId()) << "]"
             << (msgUser->isBanned() ? "[banned]" : std::string())
             << (msgUser->isAdmin() ? "[admin]" : std::string())
-            << " [messageID " << messages[i].getId() << "] "            
+            << " [messageID " << messages[i].getId() << "] "
             << std::endl;
         std::cout << messages[i].getMessage() << std::endl;
     }

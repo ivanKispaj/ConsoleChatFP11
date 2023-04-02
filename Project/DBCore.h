@@ -136,7 +136,6 @@ nullptr if array is empty or index out if range..
                 _array[i] = temporaryArray[i];
             }
             _size = size;
-
         }
     }
 };
