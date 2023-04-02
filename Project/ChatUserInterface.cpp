@@ -381,7 +381,7 @@ void ChatUserInterface::complaint()
     UserInput<std::string, std::string> complaintTextIO(std::string(), "Укажите причину жалобы: ", std::string());
     UserInput<int, int> troubleUserIdIO(std::string(), "Укажите userId пользователя на которого хотите пожаловаться: ", std::string());
     UserInput<int, int> troubleMsgIdIO(std::string(), "Укажите messageID сообщения на которое хотите пожаловаться: ", std::string());
-    UserInput<std::string, chat::Results> yesnoIO(std::string(), "Отменить жалобу? (да - отменить / нет - не отменять): ", "Неверный ввод", 4);
+    UserInput<std::string, chat::Results> yesnoIO(std::string(), "Отменить жалобу? (да - отменить / нет - не отменять): ", "Неверный ввод. Требуется да или нет", 4);
     yesnoIO.addInputs("да", "нет", "yes", "no");
     yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
 
@@ -398,7 +398,7 @@ void ChatUserInterface::complaint()
         auto _troubleUser = db->getUserById(troubleUserId);
         if (_troubleUser == nullptr)
         {
-            yesnoIO.setDescription("Указан неверный userId");
+            std::cout << "Указан неверный userId" << std::endl;
             chat::Results yesno = yesnoIO.IOgetline();
             if (yesno == chat::yes)
             {
@@ -422,7 +422,7 @@ void ChatUserInterface::complaint()
         auto _troubleMsg = db->getMessage(troubleMsgId);
         if (_troubleMsg == nullptr)
         {
-            yesnoIO.setDescription("Указан неверный messageID");
+            std::cout << "Указан неверный messageID" << std::endl;
             chat::Results yesno = yesnoIO.IOgetline();
             if (yesno == chat::yes)
             {
