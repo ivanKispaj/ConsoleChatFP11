@@ -28,6 +28,8 @@ namespace chat
         user_is_service,
         user_profile,
         complaint,
+        messages,
+        delete_message,
     };
 };
 namespace user

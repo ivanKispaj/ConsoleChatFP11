@@ -38,15 +38,15 @@ ChatRun::ChatRun()
 
     Message msg;
     msg.setMessage("Всем привет!");
-    msg.setAuthorID(2);
-    db->AddMessageToAllUsers(msg);
-
-    msg.setMessage("И тебе привет 👋!");
     msg.setAuthorID(3);
     db->AddMessageToAllUsers(msg);
 
-    msg.setMessage("Как у нас дела? 🔥 ;-))))))");
+    msg.setMessage("И тебе привет 👋!");
     msg.setAuthorID(4);
+    db->AddMessageToAllUsers(msg);
+
+    msg.setMessage("Как у нас дела? 🔥 ;-))))))");
+    msg.setAuthorID(5);
     db->AddMessageToAllUsers(msg);
 
     msg.setMessage("Надеюсь всё хорошо");
