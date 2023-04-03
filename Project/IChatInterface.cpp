@@ -51,6 +51,11 @@ chat::Results IChatInterface::login()
             }
         }
     } while (!validate);
+
+    if (user->isBanned())
+    {
+        return chat::user_banned;
+    }
     return chat::login_success;
 }
 
@@ -148,7 +153,7 @@ void IChatInterface::pgNavigation()
         pg_itemsPerPage = getInt.IOcinThrough();
         break;
     case page::page:
-        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber - 1) + "): ");
+        getInt.setMainMessage("Укажите номер страницы (1 - " + std::to_string(pg_maxPageNumber) + "): ");
         pg_pageNumber = getInt.IOcinThrough();
         paginationMode = page::page;
         break;
@@ -158,11 +163,17 @@ void IChatInterface::pgNavigation()
         paginationMode = page::message;
         break;
     case page::last_page:
-        pg_MaxItems = 10;
-        paginationMode = page::last_page;
+        pgDefault();
     default:
         break;
     }
+}
+
+std::string IChatInterface::pgInfo()
+{
+    return std::to_string((pg_MaxItems <= 0) ? pg_StartItem : pg_StartItem + 1) + " - " +
+           std::to_string(pg_EndItem) + " из " +
+           std::to_string(pg_MaxItems);
 }
 
 std::string IChatInterface::StampToTime(long long timestamp)
@@ -188,9 +199,11 @@ void IChatInterface::messagesList(std::unique_ptr<Message[]> messages)
             << i + 1 << ". "
             << StampToTime(messages[i].getDate()) + " "
             << msgUser->getUserName()
-            << "[" << msgUser->getUserLogin() << "] "
-            << "\t[messageID " << messages[i].getId() << "] "
+            << "[" << msgUser->getUserLogin() << "]"
             << "[userID " << std::to_string(msgUser->getId()) << "]"
+            << (msgUser->isBanned() ? "[banned]" : std::string())
+            << (msgUser->isAdmin() ? "[admin]" : std::string())
+            << " [messageID " << messages[i].getId() << "] "
             << std::endl;
         std::cout << messages[i].getMessage() << std::endl;
     }
@@ -206,10 +219,80 @@ void IChatInterface::usersList(std::unique_ptr<User[]> users)
         std::cout
             << i + 1 << ". "
             << users[i].getUserName()
-            << "[" << users[i].getUserLogin() << "] "
-            << "\t[userID " << std::to_string(users[i].getId()) << "]"
+            << "[" << users[i].getUserLogin() << "]"
+            << "[userID " << std::to_string(users[i].getId()) << "]"
+            << (users[i].isBanned() ? "[banned]" : std::string())
+            << (users[i].isAdmin() ? "[admin]" : std::string())
             << std::endl;
         std::cout << std::endl;
     }
     std::cout << std::endl;
+}
+
+void IChatInterface::userProfile()
+{
+    UserInput<std::string, user::options> options("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]",
+                                                  "Какие данные вы хотите поменять? (л - логин; п - пароль; и - имя; з - закончить): ",
+                                                  "Неверный ввод",
+                                                  4);
+    options.addInputs("л", "п", "и", "з");
+    options.addOutputs(user::login, user::pass, user::name, user::end);
+
+    UserInput<std::string, std::string> getLogin("Изменение логина", "Введите логин: ", std::string());
+    UserInput<std::string, std::string> getName("Изменение имени", "Введите имя: ", std::string());
+    UserInput<std::string, std::string> getPass("Изменение пароля", "Введите пароль: ", std::string());
+    UserInput<std::string, chat::Results> loginCancel(std::string(), "Отменить смену логина? (да - отменить, нет - продолжить): ", "Неверный ввод. Требуется: да или нет", 4);
+    loginCancel.addInputs("да", "нет", "yes", "no");
+    loginCancel.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
+
+    std::string login;
+    std::string name;
+    std::string pass;
+
+    do
+    {
+        options.setDescription("Настройки пользователя. " + user->getUserName() + "[" + user->getUserLogin() + "]");
+        user::options result = options.IOgetline();
+        switch (result)
+        {
+        case user::login:
+        {
+            // ввод логина
+            bool validLogin = false;
+            do
+            {
+                login = getLogin.IOgetlineThrough(true);
+
+                validLogin = db->isUniqueLogin(login);
+                if (!validLogin)
+                {
+                    std::cout << "Этот логин занят!" << std::endl;
+                    if (loginCancel.IOgetline() == chat::yes)
+                    {
+                        break;
+                    }
+                }
+                user->setUserLogin(login);
+                db->updateUserData(*user);
+
+            } while (!validLogin);
+        }
+        break;
+        case user::name:
+            name = getName.IOgetlineThrough(true);
+            user->setUserName(name);
+            db->updateUserData(*user);
+            break;
+
+        case user::pass:
+            pass = getPass.IOgetlineThrough(true);
+            db->setUserPassword(user->getId(), pass);
+            break;
+        case user::end:
+            return;
+        default:
+            break;
+        }
+
+    } while (1);
 }

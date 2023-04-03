@@ -68,7 +68,7 @@ public:
     /*
 overloaded index taking operator.
 Returns a pointer to the array value by index,
-nullptr if array is empry or index out if range..
+nullptr if array is empty or index out if range..
 */
     T &operator[](const int index)
     {

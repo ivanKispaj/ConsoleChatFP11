@@ -12,6 +12,10 @@ chat::Results ChatUserInterface::run(std::unique_ptr<DB> _db)
     do
     {
         system(clear);
+        if (userInput == chat::user_banned)
+        {
+            std::cout << "Пользователь заблокирован администратором" << std::endl;
+        }
         userInput = chatAreaPage.IOgetline();
         switch (userInput)
         {
@@ -44,6 +48,7 @@ chat::Results ChatUserInterface::loginInChat()
     {
         return publicChat();
     }
+
     return result;
 }
 
@@ -106,15 +111,18 @@ chat::Results ChatUserInterface::publicChat()
     std::string chatDescription;
     std::string mainMessage;
 
-    mainMessage = "Выберите действие: "
-                  "(с - написать сообщение; "
-                  "н - настройки; "
-                  "л - личные сообщения; "
-                  "в - выход): ";
+    mainMessage = "Операции в чате: "
+                  "\nс - написать сообщение;"
+                  "\nн - навигация по чату;"
+                  "\nл - личные сообщения;"
+                  "\nж - пожаловаться;"
+                  "\nп - настройки профиля;"
+                  "\nв - выход;"
+                  "\nУкажите операцию: ";
 
-    UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 4);
-    chatMainPage.addInputs("с", "н", "л", "в");
-    chatMainPage.addOutputs(chat::send_message, chat::chat_options, chat::private_chat, chat::back);
+    UserInput<std::string, chat::Results> chatMainPage(chatDescription, mainMessage, "Неверный ввод", 6);
+    chatMainPage.addInputs("с", "н", "л", "ж", "п", "в");
+    chatMainPage.addOutputs(chat::send_message, chat::chat_options, chat::private_chat, chat::complaint, chat::user_profile, chat::back);
 
     chat::Results result = chat::empty;
 
@@ -147,6 +155,12 @@ chat::Results ChatUserInterface::publicChat()
             break;
         case chat::private_chat:
             result = privateChat();
+            break;
+        case chat::complaint:
+            complaint();
+            break;
+        case chat::user_profile:
+            userProfile();
             break;
         default:
             break;
@@ -213,11 +227,22 @@ chat::Results ChatUserInterface::privateChat()
         }
 
         usersList(std::move(users));
-
-        if (result == chat::user_not_found)
+        switch (result)
         {
+        case chat::user_not_found:
             std::cout << "Пользователь не найден." << std::endl;
+            break;
+        case chat::user_banned:
+            std::cout << "Пользователь заблокирован администратором." << std::endl;
+            break;
+        case chat::user_is_service:
+            std::cout << "C этим пользователем нельзя вести личные беседы." << std::endl;
+            break;
+
+        default:
+            break;
         }
+
         chatDescription = "Личные сообщения. Главная страница.\n"
                           "Вы: " +
                           user->getUserName() + " [" + user->getUserLogin() + "]\t[userID " + std::to_string(user->getId()) + "]\n" +
@@ -285,11 +310,12 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
     system(clear);
     pgDefault();
     std::string chatDescription;
-    std::string mainMessage = "Выберите действие: "
-                              "(с - написать сообщение; "
-                              "н - навигация по сообщениям; "
-                              "п - вернуться публичный чат; "
-                              "в - выход из беседы): ";
+    std::string mainMessage = "Опции: "
+                              "\nс - написать сообщение; "
+                              "\nн - навигация по сообщениям; "
+                              "\nп - вернуться публичный чат; "
+                              "\nв - выход из беседы;"
+                              "\nВыберите опцию: ";
 
     UserInput<std::string, chat::Results> chatConversationPage(chatDescription, mainMessage, "Неверный ввод", 4);
     chatConversationPage.addInputs("с", "н", "п", "в");
@@ -297,6 +323,18 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
 
     do
     {
+        if (pm_user->isBanned())
+        {
+            pgDefault();
+            pm_user = nullptr;
+            return chat::user_banned;
+        }
+        if (pm_user->getUserLogin() == "complaint_bot")
+        {
+            pgDefault();
+            pm_user = nullptr;
+            return chat::user_is_service;
+        }
         auto messages = db->getAllPrivateMessagesForUsersById(user->getId(), pm_user->getId(), pg_MaxItems);
         messagesList(std::move(messages));
         if (pg_MaxItems <= 0)
@@ -337,4 +375,61 @@ chat::Results ChatUserInterface::privateChatWithUser(chat::Results result)
     pgDefault();
     pm_user = nullptr;
     return result;
+}
+
+void ChatUserInterface::complaint()
+{
+    UserInput<std::string, std::string> complaintTextIO(std::string(), "Укажите причину жалобы: ", std::string());
+    UserInput<int, int> troubleMsgIdIO(std::string(), "Укажите messageID сообщения на которое хотите пожаловаться: ", std::string());
+    UserInput<std::string, chat::Results> yesnoIO(std::string(), "Отменить жалобу? (да - отменить / нет - не отменять): ", "Неверный ввод. Требуется да или нет", 4);
+    yesnoIO.addInputs("да", "нет", "yes", "no");
+    yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
+
+    std::string text = complaintTextIO.IOgetlineThrough(true);
+    std::unique_ptr<Message> troubleMsg = nullptr;
+
+    int troubleMsgId = 0;
+
+    do
+    {
+        troubleMsgId = troubleMsgIdIO.IOcinThrough();
+        auto _troubleMsg = db->getMessage(troubleMsgId);
+        if (_troubleMsg == nullptr)
+        {
+            std::cout << "Указан неверный messageID" << std::endl;
+            chat::Results yesno = yesnoIO.IOgetline();
+            if (yesno == chat::yes)
+            {
+                return;
+            }
+            else if (yesno == chat::no)
+            {
+                continue;
+            }
+        }
+        else
+        {
+            troubleMsg = std::move(_troubleMsg);
+        }
+    } while (troubleMsg == nullptr);
+
+    auto troubleUser = db->getUserById(troubleMsg->getAuthorID());
+    std::string messageText = "\nЖалоба от пользователя: " +
+                              user->getUserName() +
+                              "[" + user->getUserLogin() + "][userId " + std::to_string(user->getId()) + "]\n" +
+                              "На пользователя: " +
+                              troubleUser->getUserName() +
+                              "[" + troubleUser->getUserLogin() + "][userId " + std::to_string(troubleUser->getId()) + "]\n" +
+                              "Текст жалобы: " + text +
+                              "\nЗа сообщение: [messageId " + std::to_string(troubleMsg->getId()) + "]. Текст сообщения: " + troubleMsg->getMessage() +
+                              "\nuserID автора сообщения: " + std::to_string(troubleMsg->getAuthorID());
+
+    yesnoIO.setDescription(messageText);
+    yesnoIO.setMainMessage("Вы действительно хотите отправить эту жалобу администрации чата? (да / нет): ");
+    yesnoIO.IOgetline();
+    Message m;
+    m.setAuthorID(user->getId());
+    m.setRecipientID(2);
+    m.setMessage(messageText);
+    db->addMessage(m);
 }

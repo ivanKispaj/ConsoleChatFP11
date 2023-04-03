@@ -36,7 +36,10 @@ public:
     /// @param mainMessage - Сообщение пользователю
     /// @param failMessage - Сообщение при неверном вводе
     UserInput(std::string description, std::string mainMessage, std::string failMessage);
-    UserInput() = default;
+
+    /// @brief Создает страницу сквозного пользовательского ввода (output = input). Без указания сообщений запроса.
+    /// Запросы можно задать во время выполнения.
+    UserInput();
     ~UserInput() = default;
 
     /// @brief Задает возможные варианты множественного ввода. Количество аргументов должно быть равным ioCapacity конструктора
@@ -101,6 +104,14 @@ inline UserInput<I, O>::UserInput(std::string description, std::string mainMessa
     Description = description;
     MainMessage = mainMessage;
     FailMessage = failMessage;
+    throughIO = true;
+    inputs = std::make_unique<I[]>(1);
+    outputs = std::make_unique<O[]>(1);
+}
+
+template <typename I, typename O>
+inline UserInput<I, O>::UserInput()
+{
     throughIO = true;
     inputs = std::make_unique<I[]>(1);
     outputs = std::make_unique<O[]>(1);

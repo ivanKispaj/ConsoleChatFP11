@@ -72,7 +72,7 @@ void User::setIsAdmin(bool isAdmin)
     _isAdmin = isAdmin;
 }
 
-void User::setIsBannded(bool isBanned)
+void User::setIsBanned(bool isBanned)
 {
     _isBanned = isBanned;
 }
@@ -120,7 +120,7 @@ void User::setMessageCout(int cout)
     _messageCount = cout;
 }
 
-void User::addedMesage(int count)
+void User::addedMessage(int count)
 {
     _messageCount = _messageCount + count;
 }

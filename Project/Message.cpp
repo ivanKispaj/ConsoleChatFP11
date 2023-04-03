@@ -51,7 +51,7 @@ long long int Message::getDate() const
 
 Message &Message::operator=(const Message &message)
 {
-    isPrivat = message.isPrivat;
+    isPrivate = message.isPrivate;
     _message = message.getMessage();
     _authorID = message.getAuthorID();
     _recipientID = message.getRecipientID();

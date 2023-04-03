@@ -36,4 +36,6 @@ public:
 
     void searchUser(chat::Results result);
     chat::Results privateChatWithUser(chat::Results result);
+
+    void complaint();
 };
