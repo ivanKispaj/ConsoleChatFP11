@@ -103,13 +103,13 @@ template <typename I, typename O>
 inline UserInput<I, O>::UserInput(const std::string &description,
                                   const std::string &mainMessage,
                                   const std::string &failMessage) : Description(description),
-                                                             MainMessage(mainMessage),
-                                                             FailMessage(failMessage),
-                                                             ioCount{0},
-                                                             ioLength(0),
-                                                             inputs(std::make_unique<I[]>(1)),
-                                                             outputs(std::make_unique<O[]>(1)),
-                                                             throughIO(true) {}
+                                                                    MainMessage(mainMessage),
+                                                                    FailMessage(failMessage),
+                                                                    ioCount{0},
+                                                                    ioLength(0),
+                                                                    inputs(std::make_unique<I[]>(1)),
+                                                                    outputs(std::make_unique<O[]>(1)),
+                                                                    throughIO(true) {}
 
 template <typename I, typename O>
 inline UserInput<I, O>::UserInput() : inputs(std::make_unique<I[]>(1)), outputs(std::make_unique<O[]>(1)), throughIO(true) {}

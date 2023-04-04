@@ -36,11 +36,10 @@ void ChatAdminInterface::mainPage()
     adminAreaPage.addInputs("п", "с", "ж", "в");
     adminAreaPage.addOutputs(chat::user_list, chat::messages, chat::complaint, chat::back);
 
-    auto result = chat::empty;
     do
     {
         system(clear);
-        result = adminAreaPage.IOgetline();
+        auto result = adminAreaPage.IOgetline();
         switch (result)
         {
         case chat::user_list:
@@ -74,7 +73,6 @@ void ChatAdminInterface::complaintManage()
                              chat::user_list,
                              chat::messages,
                              chat::back);
-    chat::Results result;
 
     do
     {
@@ -97,7 +95,7 @@ void ChatAdminInterface::complaintManage()
                           "\nУкажите опцию: ";
         complaintPage.setDescription(chatDescription);
         complaintPage.setMainMessage(chatMainMessage);
-        result = complaintPage.IOgetline();
+        auto result = complaintPage.IOgetline();
         switch (result)
         {
         case chat::delete_message:
@@ -136,8 +134,6 @@ void ChatAdminInterface::messagesManage()
     messagesPage.addOutputs(chat::delete_message,
                             chat::chat_options,
                             chat::back);
-    chat::Results result;
-
     do
     {
         std::string chatDescription;
@@ -157,7 +153,7 @@ void ChatAdminInterface::messagesManage()
                           "\nУкажите опцию: ";
         messagesPage.setDescription(chatDescription);
         messagesPage.setMainMessage(chatMainMessage);
-        result = messagesPage.IOgetline();
+        auto result = messagesPage.IOgetline();
         switch (result)
         {
         case chat::delete_message:
@@ -193,7 +189,6 @@ void ChatAdminInterface::usersManage()
                          chat::user_not_admin,
                          chat::chat_options,
                          chat::back);
-    chat::Results result;
 
     do
     {
@@ -219,7 +214,7 @@ void ChatAdminInterface::usersManage()
                           "\nУкажите опцию: ";
         usersPage.setDescription(chatDescription);
         usersPage.setMainMessage(chatMainMessage);
-        result = usersPage.IOgetline();
+        auto result = usersPage.IOgetline();
         switch (result)
         {
         case chat::user_ban:
