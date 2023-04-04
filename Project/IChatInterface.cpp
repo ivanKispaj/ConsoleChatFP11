@@ -243,7 +243,7 @@ void IChatInterface::userProfile()
     loginCancel.addInputs("да", "нет", "yes", "no");
     loginCancel.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
 
-    std::string loginTemp;
+    std::string login;
     std::string name;
     std::string pass;
 
@@ -259,9 +259,9 @@ void IChatInterface::userProfile()
             bool validLogin = false;
             do
             {
-                loginTemp = getLogin.IOgetlineThrough(true);
+                login = getLogin.IOgetlineThrough(true);
 
-                validLogin = db->isUniqueLogin(loginTemp);
+                validLogin = db->isUniqueLogin(login);
                 if (!validLogin)
                 {
                     std::cout << "Этот логин занят!" << std::endl;
@@ -270,7 +270,7 @@ void IChatInterface::userProfile()
                         break;
                     }
                 }
-                user->setUserLogin(loginTemp);
+                user->setUserLogin(login);
                 db->updateUserData(*user);
 
             } while (!validLogin);
