@@ -2,7 +2,6 @@
 
 chat::Results IChatInterface::login()
 {
-    std::string _login;
     chat::Results endInput = chat::empty;
     std::string incorrectInput = "Неверный ввод. Пустые значения недопустимы.";
 
@@ -15,7 +14,7 @@ chat::Results IChatInterface::login()
     // ввод логина
     do
     {
-        _login = getLogin.IOgetlineThrough(true);
+        std::string _login = getLogin.IOgetlineThrough(true);
 
         try
         {
@@ -36,10 +35,9 @@ chat::Results IChatInterface::login()
 
     // ввод пароля
     bool validate = false;
-    std::string password;
     do
     {
-        password = getPass.IOgetlineThrough(true);
+        std::string password = getPass.IOgetlineThrough(true);
         validate = db->isCorrectPassword(user->getId(), password);
         if (!validate)
         {
@@ -245,7 +243,7 @@ void IChatInterface::userProfile()
     loginCancel.addInputs("да", "нет", "yes", "no");
     loginCancel.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
 
-    std::string login;
+    std::string loginTemp;
     std::string name;
     std::string pass;
 
@@ -261,9 +259,9 @@ void IChatInterface::userProfile()
             bool validLogin = false;
             do
             {
-                login = getLogin.IOgetlineThrough(true);
+                loginTemp = getLogin.IOgetlineThrough(true);
 
-                validLogin = db->isUniqueLogin(login);
+                validLogin = db->isUniqueLogin(loginTemp);
                 if (!validLogin)
                 {
                     std::cout << "Этот логин занят!" << std::endl;
@@ -272,7 +270,7 @@ void IChatInterface::userProfile()
                         break;
                     }
                 }
-                user->setUserLogin(login);
+                user->setUserLogin(loginTemp);
                 db->updateUserData(*user);
 
             } while (!validLogin);

@@ -212,9 +212,10 @@ chat::Results ChatUserInterface::privateChat()
                                chat::public_chat,
                                chat::back);
     chat::Results result = chat::private_chat;
-    std::string chatDescription;
     do
     {
+        std::string chatDescription;
+
         if (result == chat::public_chat)
         {
             return chat::public_chat;
@@ -388,11 +389,9 @@ void ChatUserInterface::complaint()
     std::string text = complaintTextIO.IOgetlineThrough(true);
     std::unique_ptr<Message> troubleMsg = nullptr;
 
-    int troubleMsgId = 0;
-
     do
     {
-        troubleMsgId = troubleMsgIdIO.IOcinThrough();
+        int troubleMsgId = troubleMsgIdIO.IOcinThrough();
         auto _troubleMsg = db->getMessage(troubleMsgId);
         if (_troubleMsg == nullptr)
         {

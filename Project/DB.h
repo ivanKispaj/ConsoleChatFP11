@@ -81,7 +81,7 @@ public:
     /// @param name User name
     /// @param size the reference is the size of the array, the created size of the array will be written to it
     /// @return if the array is not empty - std::unique_ptr<User[]> , nullptr if the array is empty!
-    const std::unique_ptr<User[]> getAllUsers(std::string name, int &size) const;
+    const std::unique_ptr<User[]> getAllUsers(const std::string &name, int &size) const;
 
     /// @brief Get a user by login
     /// @param login string -> user login

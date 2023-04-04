@@ -29,13 +29,13 @@ public:
     /// @param mainMessage - Сообщение пользователю
     /// @param failMessage - Сообщение при неверном вводе
     /// @param ioCapacity - Количество возможных вариантов ввода
-    UserInput(std::string description, std::string mainMessage, std::string failMessage, int ioCapacity);
+    UserInput(const std::string &description, const std::string &mainMessage, const std::string &failMessage, int ioCapacity);
 
     /// @brief Создает страницу сквозного пользовательского ввода. output = input.
     /// @param description - Заголовок страницы
     /// @param mainMessage - Сообщение пользователю
     /// @param failMessage - Сообщение при неверном вводе
-    UserInput(std::string description, std::string mainMessage, std::string failMessage);
+    UserInput(const std::string &description, const std::string &mainMessage, const std::string &failMessage);
 
     /// @brief Создает страницу сквозного пользовательского ввода (output = input). Без указания сообщений запроса.
     /// Запросы можно задать во время выполнения.
@@ -81,41 +81,38 @@ public:
     /// @return
     std::string IOgetlineThrough(bool denyEmpty = false);
 
-    void setDescription(std::string newText);
-    void setMainMessage(std::string newText);
-    void setFailMessage(std::string newText);
+    void setDescription(const std::string &newText);
+    void setMainMessage(const std::string &newText);
+    void setFailMessage(const std::string &newText);
 };
 
 template <typename I, typename O>
-inline UserInput<I, O>::UserInput(std::string description, std::string mainMessage, std::string failMessage, int ioCapacity)
-{
-    Description = description;
-    MainMessage = mainMessage;
-    FailMessage = failMessage;
-    ioLength = ioCapacity;
-    inputs = std::make_unique<I[]>(ioLength);
-    outputs = std::make_unique<O[]>(ioLength);
-    throughIO = false;
-}
+inline UserInput<I, O>::UserInput(const std::string &description,
+                                  const std::string &mainMessage,
+                                  const std::string &failMessage,
+                                  int ioCapacity) : Description(description),
+                                                    MainMessage(mainMessage),
+                                                    FailMessage(failMessage),
+                                                    ioCount{0},
+                                                    ioLength(ioCapacity),
+                                                    inputs(std::make_unique<I[]>(ioLength)),
+                                                    outputs(std::make_unique<O[]>(ioLength)),
+                                                    throughIO(false) {}
 
 template <typename I, typename O>
-inline UserInput<I, O>::UserInput(std::string description, std::string mainMessage, std::string failMessage)
-{
-    Description = description;
-    MainMessage = mainMessage;
-    FailMessage = failMessage;
-    throughIO = true;
-    inputs = std::make_unique<I[]>(1);
-    outputs = std::make_unique<O[]>(1);
-}
+inline UserInput<I, O>::UserInput(const std::string &description,
+                                  const std::string &mainMessage,
+                                  const std::string &failMessage) : Description(description),
+                                                             MainMessage(mainMessage),
+                                                             FailMessage(failMessage),
+                                                             ioCount{0},
+                                                             ioLength(0),
+                                                             inputs(std::make_unique<I[]>(1)),
+                                                             outputs(std::make_unique<O[]>(1)),
+                                                             throughIO(true) {}
 
 template <typename I, typename O>
-inline UserInput<I, O>::UserInput()
-{
-    throughIO = true;
-    inputs = std::make_unique<I[]>(1);
-    outputs = std::make_unique<O[]>(1);
-}
+inline UserInput<I, O>::UserInput() : inputs(std::make_unique<I[]>(1)), outputs(std::make_unique<O[]>(1)), throughIO(true) {}
 
 template <typename I, typename O>
 inline O UserInput<I, O>::IOcin()
@@ -215,19 +212,19 @@ inline std::string UserInput<I, O>::IOgetlineThrough(bool denyEmpty)
 }
 
 template <typename I, typename O>
-inline void UserInput<I, O>::setDescription(std::string newText)
+inline void UserInput<I, O>::setDescription(const std::string &newText)
 {
     Description = newText;
 }
 
 template <typename I, typename O>
-inline void UserInput<I, O>::setMainMessage(std::string newText)
+inline void UserInput<I, O>::setMainMessage(const std::string &newText)
 {
     MainMessage = newText;
 }
 
 template <typename I, typename O>
-inline void UserInput<I, O>::setFailMessage(std::string newText)
+inline void UserInput<I, O>::setFailMessage(const std::string &newText)
 {
     FailMessage = newText;
 }

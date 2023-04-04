@@ -144,7 +144,7 @@ const std::unique_ptr<User[]> DB::getAllUsers() const
     return nullptr;
 }
 
-const std::unique_ptr<User[]> DB::getAllUsers(std::string name, int &size) const
+const std::unique_ptr<User[]> DB::getAllUsers(const std::string &name, int &size) const
 {
     size = 0;
     if (_userDB.count() > 0)
@@ -160,7 +160,7 @@ const std::unique_ptr<User[]> DB::getAllUsers(std::string name, int &size) const
         }
         if (size > 0)
         {
-            return std::move(ret);
+            return ret;
         }
     }
     size = 0;
@@ -429,7 +429,7 @@ const std::unique_ptr<Message[]> DB::getAllPrivateMessagesForUserById(int userId
                 ret[i] = newMessageArray[i];
             }
             size = newMessageArray.count();
-            return std::move(ret);
+            return ret;
         }
     }
     size = 0;
