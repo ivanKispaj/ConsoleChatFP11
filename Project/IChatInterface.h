@@ -80,5 +80,6 @@ public:
     /// @param users массив пользователей
     void usersList(std::unique_ptr<User[]> users = nullptr);
 
+    /// @brief Реализует страницу редактирования профиля пользователя.
     void userProfile();
 };
