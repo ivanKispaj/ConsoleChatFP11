@@ -48,9 +48,7 @@ public:
     paginationMode = message - рассчитает диапазон pg_StartItem + pg_itemsPerPage
     paginationMode = last_page - рассчитает диапазон последних pg_itemsPerPage в списке
     Если суммирование pg_itemsPerPage выходит за пределы максимального количества элементов списка, диапазон будет урезан.
-
     После вызова pagination() будут вычислены значения переменных pg_maxPageNumber, pg_StartItem, pg_EndItem
-
     Вывести список после пагинации:
     for (int i = pg_StartItem; i < pg_EndItem; i++)
     {
@@ -80,5 +78,6 @@ public:
     /// @param users массив пользователей
     void usersList(std::unique_ptr<User[]> users = nullptr);
 
+    /// @brief Реализует страницу редактирования профиля пользователя.
     void userProfile();
 };

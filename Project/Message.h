@@ -28,10 +28,10 @@ struct Message
     /// @param authorID int author ID
     /// @param recipientID int recipient ID
     /// @param privateChat bool -> true - private chat / false - public chat
-    Message(const std::string message, int authorID, int recipientID, bool privateChat = false) : isPrivate(privateChat),
-                                                                                                  _message(message),
-                                                                                                  _authorID(authorID),
-                                                                                                  _recipientID(recipientID) {}
+    Message(const std::string &message, int authorID, int recipientID, bool privateChat = false) : isPrivate(privateChat),
+                                                                                                   _message(message),
+                                                                                                   _authorID(authorID),
+                                                                                                   _recipientID(recipientID) {}
 
     /// @brief Assigns a message to an object
     /// @param message string

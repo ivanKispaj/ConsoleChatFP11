@@ -34,8 +34,11 @@ public:
     /// @return
     chat::Results privateChat();
 
+    /// @brief Поиск пользователя
+    /// @param result задает критерии: по логину или имени
     void searchUser(chat::Results result);
     chat::Results privateChatWithUser(chat::Results result);
 
+    /// @brief Интерактивное меню жалоб на сообщения
     void complaint();
 };

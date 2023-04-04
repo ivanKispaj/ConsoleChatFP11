@@ -389,11 +389,9 @@ void ChatUserInterface::complaint()
     std::string text = complaintTextIO.IOgetlineThrough(true);
     std::unique_ptr<Message> troubleMsg = nullptr;
 
-    int troubleMsgId = 0;
-
     do
     {
-        troubleMsgId = troubleMsgIdIO.IOcinThrough();
+        int troubleMsgId = troubleMsgIdIO.IOcinThrough();
         auto _troubleMsg = db->getMessage(troubleMsgId);
         if (_troubleMsg == nullptr)
         {

@@ -35,7 +35,7 @@ public:
     /// @param description - Заголовок страницы
     /// @param mainMessage - Сообщение пользователю
     /// @param failMessage - Сообщение при неверном вводе
-    UserInput(std::string description, std::string mainMessage, std::string failMessage);
+    UserInput(const std::string &description, const std::string &mainMessage, const std::string &failMessage);
 
     /// @brief Создает страницу сквозного пользовательского ввода (output = input). Без указания сообщений запроса.
     /// Запросы можно задать во время выполнения.
@@ -112,23 +112,7 @@ inline UserInput<I, O>::UserInput(const std::string &description,
                                                                     throughIO(true) {}
 
 template <typename I, typename O>
-inline UserInput<I, O>::UserInput(std::string description, std::string mainMessage, std::string failMessage)
-{
-    Description = description;
-    MainMessage = mainMessage;
-    FailMessage = failMessage;
-    throughIO = true;
-    inputs = std::make_unique<I[]>(1);
-    outputs = std::make_unique<O[]>(1);
-}
-
-template <typename I, typename O>
-inline UserInput<I, O>::UserInput()
-{
-    throughIO = true;
-    inputs = std::make_unique<I[]>(1);
-    outputs = std::make_unique<O[]>(1);
-}
+inline UserInput<I, O>::UserInput() : inputs(std::make_unique<I[]>(1)), outputs(std::make_unique<O[]>(1)), throughIO(true) {}
 
 template <typename I, typename O>
 inline O UserInput<I, O>::IOcin()

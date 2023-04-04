@@ -29,8 +29,8 @@ ChatRun::ChatRun()
     ChatUserInterface userInterface;
     ChatAdminInterface adminInterface;
 
-    chat::Results userInput = chat::empty;
-    chat::Results result = chat::empty;
+    chat::Results userInput;
+    chat::Results result;
     // Объект страницы
     UserInput<std::string, chat::Results> coreAreaPage("Главная станица",
                                                        "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",

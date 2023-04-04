@@ -3,8 +3,8 @@
 chat::Results ChatAdminInterface::run(std::unique_ptr<DB> _db)
 {
     db = std::move(_db);
-    auto complaintBot = db->getUserByLogin("complaint_bot");
-    this->complaintBot = std::move(complaintBot);
+    auto complaintBotTemp = db->getUserByLogin("complaint_bot");
+    this->complaintBot = std::move(complaintBotTemp);
     auto _login = login();
     if (_login == chat::login_success && user->isAdmin())
     {
@@ -36,11 +36,10 @@ void ChatAdminInterface::mainPage()
     adminAreaPage.addInputs("п", "с", "ж", "в");
     adminAreaPage.addOutputs(chat::user_list, chat::messages, chat::complaint, chat::back);
 
-    auto result = chat::empty;
     do
     {
         system(clear);
-        result = adminAreaPage.IOgetline();
+        auto result = adminAreaPage.IOgetline();
         switch (result)
         {
         case chat::user_list:
@@ -74,11 +73,11 @@ void ChatAdminInterface::complaintManage()
                              chat::user_list,
                              chat::messages,
                              chat::back);
-    chat::Results result = chat::empty;
-    std::string chatDescription;
-    std::string chatMainMessage;
+
     do
     {
+        std::string chatDescription;
+        std::string chatMainMessage;
         system(clear);
         auto complaintList = db->getAllPrivateMessagesForUserById(complaintBot->getId(), pg_MaxItems);
         messagesList(std::move(complaintList));
@@ -96,7 +95,7 @@ void ChatAdminInterface::complaintManage()
                           "\nУкажите опцию: ";
         complaintPage.setDescription(chatDescription);
         complaintPage.setMainMessage(chatMainMessage);
-        result = complaintPage.IOgetline();
+        auto result = complaintPage.IOgetline();
         switch (result)
         {
         case chat::delete_message:
@@ -135,11 +134,10 @@ void ChatAdminInterface::messagesManage()
     messagesPage.addOutputs(chat::delete_message,
                             chat::chat_options,
                             chat::back);
-    chat::Results result = chat::empty;
-    std::string chatDescription;
-    std::string chatMainMessage;
     do
     {
+        std::string chatDescription;
+        std::string chatMainMessage;
         system(clear);
         auto messages = db->getAllPublicMessages(pg_MaxItems);
         messagesList(std::move(messages));
@@ -155,7 +153,7 @@ void ChatAdminInterface::messagesManage()
                           "\nУкажите опцию: ";
         messagesPage.setDescription(chatDescription);
         messagesPage.setMainMessage(chatMainMessage);
-        result = messagesPage.IOgetline();
+        auto result = messagesPage.IOgetline();
         switch (result)
         {
         case chat::delete_message:
@@ -191,11 +189,11 @@ void ChatAdminInterface::usersManage()
                          chat::user_not_admin,
                          chat::chat_options,
                          chat::back);
-    chat::Results result = chat::empty;
-    std::string chatDescription;
-    std::string chatMainMessage;
+
     do
     {
+        std::string chatDescription;
+        std::string chatMainMessage;
         system(clear);
         auto users = db->getAllUsers();
         pg_MaxItems = db->usersCount();
@@ -216,7 +214,7 @@ void ChatAdminInterface::usersManage()
                           "\nУкажите опцию: ";
         usersPage.setDescription(chatDescription);
         usersPage.setMainMessage(chatMainMessage);
-        result = usersPage.IOgetline();
+        auto result = usersPage.IOgetline();
         switch (result)
         {
         case chat::user_ban:
@@ -270,7 +268,7 @@ void ChatAdminInterface::deleteMessage(bool complaint_only)
     UserInput<std::string, chat::Results> yesnoIO(std::string(), "Вы действительно хотите удалить сообщение? (да - удалить / нет - не удалять): ", "Неверный ввод. Требуется да или нет", 4);
     yesnoIO.addInputs("да", "нет", "yes", "no");
     yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
-    int msgId = 0;
+
     do
     {
         int msgId = getMessage.IOcinThrough();
@@ -308,9 +306,10 @@ void ChatAdminInterface::userBan(bool ban)
     UserInput<std::string, chat::Results> yesnoIO(std::string(), std::string(), "Неверный ввод. Требуется да или нет", 4);
     yesnoIO.addInputs("да", "нет", "yes", "no");
     yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
-    int userId = 0;
+
     do
     {
+        int userId = 0;
         userId = getUser.IOcinThrough();
         auto _user = db->getUserById(userId);
         if (_user != nullptr)
@@ -379,10 +378,10 @@ void ChatAdminInterface::userSetAdmin(bool adm)
     UserInput<std::string, chat::Results> yesnoIO(std::string(), std::string(), "Неверный ввод. Требуется да или нет", 4);
     yesnoIO.addInputs("да", "нет", "yes", "no");
     yesnoIO.addOutputs(chat::yes, chat::no, chat::yes, chat::no);
-    int userId = 0;
     auto result = chat::empty;
     do
     {
+        int userId = 0;
         userId = getUser.IOcinThrough();
         auto _user = db->getUserById(userId);
         if (_user != nullptr)
@@ -438,7 +437,7 @@ void ChatAdminInterface::userSetAdmin(bool adm)
             {
                 yesnoIO.setMainMessage("Вы действительно хотите снять права администратора? ( да / нет ): ");
             }
-            auto result = yesnoIO.IOgetline();
+            result = yesnoIO.IOgetline();
             if (result == chat::yes)
             {
                 _user->setIsAdmin(adm);
