@@ -1,3 +1,5 @@
+#pragma once
+
 namespace chat
 {
     enum Results

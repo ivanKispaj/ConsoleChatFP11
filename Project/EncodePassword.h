@@ -16,6 +16,8 @@
 
 class EncodePassword
 {
+    EncodePassword() = default;
+
 public:
     /// @brief Password encoding, using a bit shift to the left with the addition of salt
     /// @param pass std::string password

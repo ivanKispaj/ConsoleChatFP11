@@ -8,12 +8,14 @@
 class ChatRun
 {
 private:
+    ChatRun() = default;
+
 public:
-    ChatRun();
     ~ChatRun() = default;
+    static void run();
 };
 
-ChatRun::ChatRun()
+void ChatRun::run()
 {
     std::unique_ptr<DB> db = std::make_unique<DB>();
     User service_admin("admin", "admin", "1234");
@@ -30,7 +32,7 @@ ChatRun::ChatRun()
     ChatAdminInterface adminInterface;
 
     chat::Results userInput;
-    chat::Results result;
+    chat::Results result = chat::empty;
     // Объект страницы
     UserInput<std::string, chat::Results> coreAreaPage("Главная станица",
                                                        "Выберите действия: ч - Чат, а - Раздел администратора, в - Выход из программы ",

@@ -5,6 +5,6 @@ const char clear[] {"clear"};
 
 int main()
 {
-    ChatRun run;
+    ChatRun::run();
     return 0;
 }
