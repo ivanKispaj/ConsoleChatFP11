@@ -80,7 +80,7 @@ void ChatAdminInterface::complaintManage()
         std::string chatMainMessage;
         system(clear);
         auto complaintList = db->getAllPrivateMessagesForUserById(complaintBot->getId(), pg_MaxItems);
-        messagesList(std::move(complaintList));
+        messagesList(complaintList);
         if (pg_MaxItems <= 0)
         {
             std::cout << "Жалобы отсутствуют." << std::endl;
@@ -140,7 +140,7 @@ void ChatAdminInterface::messagesManage()
         std::string chatMainMessage;
         system(clear);
         auto messages = db->getAllPublicMessages(pg_MaxItems);
-        messagesList(std::move(messages));
+        messagesList(messages);
         if (pg_MaxItems <= 0)
         {
             std::cout << "Публичные сообщения отсутствуют." << std::endl;
@@ -197,7 +197,7 @@ void ChatAdminInterface::usersManage()
         system(clear);
         auto users = db->getAllUsers();
         pg_MaxItems = db->usersCount();
-        usersList(std::move(users));
+        usersList(users);
 
         if (pg_MaxItems <= 0)
         {

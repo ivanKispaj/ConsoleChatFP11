@@ -6,12 +6,11 @@
 
 #pragma once
 #include <string>
-#define private      \
-    friend class DB; \
-private
 
 struct User
 {
+    friend class DB;
+
 private:
     std::string _name;
     std::string _login;
@@ -22,8 +21,6 @@ private:
     bool _isAdmin{false};   // true if the user is an admin
     bool _isBanned{false};  // true if the user is an banned
     bool _isDeleted{false}; // true if the user is an deleted account
-
-#undef private
 
     /// @brief encoding and set the user's password this is private method, the DB class has access to
     /// @param pass unencoded password
@@ -71,6 +68,17 @@ public:
     /// @param login string login unique!
     /// @param pass string password
     User(const std::string &name, const std::string &login, const std::string &pass);
+
+    User(const User &user) : _name(user._name),
+                             _login(user._login),
+                             _pass(user._pass),
+                             _messageCount(user._messageCount),
+                             _id(user._id),
+                             _isAdmin(user._isAdmin),
+                             _isBanned(user._isBanned),
+                             _isDeleted(user._isDeleted)
+    {
+    }
 
     /// @brief  public method
     /// @return return the user's ID

@@ -185,7 +185,7 @@ std::string IChatInterface::StampToTime(long long timestamp)
     return str;
 }
 
-void IChatInterface::messagesList(std::unique_ptr<Message[]> messages)
+void IChatInterface::messagesList(std::unique_ptr<Message[]> &messages)
 {
     pagination();
     for (int i{pg_StartItem}; i < pg_EndItem && messages != nullptr; i++)
@@ -208,7 +208,7 @@ void IChatInterface::messagesList(std::unique_ptr<Message[]> messages)
     std::cout << std::endl;
 }
 
-void IChatInterface::usersList(std::unique_ptr<User[]> users)
+void IChatInterface::usersList(std::unique_ptr<User[]> &users)
 {
     pg_MaxItems = db->usersCount();
     pagination();

@@ -24,12 +24,23 @@ public:
     ~DBCore() = default;
 
     //  Copy construction
-    DBCore<T>(const DBCore &array) : _size(array._size), _array(_array = std::make_unique<T[]>(array._size))
+    DBCore<T>(const DBCore<T> &array) : _size(array._size), _array(std::make_unique<T[]>(array._size))
     {
         for (int i = 0; i < _size; i++)
         {
             _array[i] = array._array[i];
         }
+    }
+
+    DBCore<T> &operator=(const DBCore<T> &array)
+    {
+        _size = array._size;
+        _array = std::make_unique<T[]>(_size);
+        for (int i = 0; i < _size; i++)
+        {
+            _array[i] = array._array[i];
+        }
+        return *this;
     }
 
     // return size of array

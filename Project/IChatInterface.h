@@ -72,11 +72,11 @@ public:
 
     /// @brief Выводит на экран список сообщений
     /// @param messages массив сообщений
-    void messagesList(std::unique_ptr<Message[]> messages = nullptr);
+    void messagesList(std::unique_ptr<Message[]> &messages);
 
     /// @brief Выводит на экран список пользователей
     /// @param users массив пользователей
-    void usersList(std::unique_ptr<User[]> users = nullptr);
+    void usersList(std::unique_ptr<User[]> &users);
 
     /// @brief Реализует страницу редактирования профиля пользователя.
     void userProfile();

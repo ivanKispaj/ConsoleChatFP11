@@ -6,12 +6,10 @@
 
 #pragma once
 #include <string>
-#define private      \
-    friend class DB; \
-private
 
 struct Message
 {
+    friend class DB;
 
     // true - a message from a private chat
     // false = true - a message from a public chat
@@ -33,6 +31,11 @@ struct Message
                                                                                                    _authorID(authorID),
                                                                                                    _recipientID(recipientID) {}
 
+    Message(const Message &message) : _message(message._message),
+                                      _authorID(message._authorID),
+                                      _recipientID(message._recipientID),
+                                      _date(message._date),
+                                      _id(message._id) {}
     /// @brief Assigns a message to an object
     /// @param message string
     void setMessage(const std::string &message);
@@ -65,15 +68,6 @@ struct Message
     /// @return long long int -> timestamp date in seconds
     long long int getDate() const;
 
-#undef private
-    // Private methods for Friends "DB"
-
-    /// @brief set date Unix Timestamp
-    void setDateMessage();
-
-    /// @brief  set message unique id
-    void setMessageId();
-
     /// @brief Overloading the assignment operator "="
     /// @param message Message to assign struct "Message"
     /// @return Message
@@ -86,4 +80,12 @@ private:
     long long int _date{0};
     int _id{0};
     static long long int _currentId;
+
+    // Private methods for Friends "DB"
+
+    /// @brief set date Unix Timestamp
+    void setDateMessage();
+
+    /// @brief  set message unique id
+    void setMessageId();
 };
